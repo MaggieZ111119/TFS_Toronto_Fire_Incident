@@ -1,13 +1,12 @@
 ---
-title: "My title"
-subtitle: "My subtitle if needed"
+title: "Analyzing Toronto Fire Incident Severity"
+subtitle: "Study Thorugh Financial and Casualty Loss to Optimize Resource Allocation for Toronto Fire Services"
 author: 
-  - First author
-  - Another author
-thanks: "Code and data are available at: [https://github.com/RohanAlexander/starter_folder](https://github.com/RohanAlexander/starter_folder)."
+  - Maggie Zhang
+thanks: "Code and data are available at: [https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident](https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident)."
 date: today
 date-format: long
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+abstract: "This study investigates different severity levels of Toronto fire incidents based on financial and casualty losses to support efficient resource allocation for Toronto Fire Service (TFS). The analysis reveals that higher-severity incidents correlate with greater financial losses and more significant human casualties, impacting both civilians and firefighters. The study identifies high-priority response criteria, including incidents originating from XXXX regions, occurring within defined time frames: XXXX, and involving XXXX as the ignition sources. These insights, derived from the modeling analysis, can guide TFS to enhance response times and prioritize tasks based on common high-risk indicators. This work aims to inform decision-making and optimize fire response operations to improve community safety in Toronto."
 format: pdf
 number-sections: true
 bibliography: references.bib
@@ -25,7 +24,12 @@ library(palmerpenguins)
 
 # Introduction
 
-Overview paragraph
+This study investigates different severity levels of Toronto fire incidents based on financial and casualty losses to support efficient resource allocation for Toronto Fire Service (TFS). The analysis reveals that higher-severity incidents correlate with greater financial losses and more significant human casualties, impacting both civilians and firefighters.
+The research identifies specific high-priority response criteria that can improve TFS operations. By examining the data, it has been found that incidents originating from XXX regions, occurring within defined time frames: XXX, and involving XXXX ignition sources exhibit higher risk profiles. This enables TFS to develop strategic response protocols that prioritize these types of incidents. The modeling analysis conducted in this study provides valuable insights into which factors contribute most significantly to incident severity, equipping TFS with the knowledge to enhance response times and allocate resources more effectively.
+
+The insights from this work aim to inform strategic decision-making processes and optimize fire response operations. By understanding and addressing the indicators of high-risk incidents, TFS can better safeguard the community and improve public safety throughout Toronto. This research is an essential step toward developing data-driven approaches that enhance both the efficiency of fire service operations and the overall resilience of the city.
+
+
 
 Estimand paragraph
 
