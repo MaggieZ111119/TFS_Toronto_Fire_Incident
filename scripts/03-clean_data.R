@@ -19,10 +19,10 @@ raw_data <- read_csv("data/01-raw_data/raw_fire_data.csv")
 columns_to_keep <- c("_id", "Area_of_Origin", "Building_Status", "Business_Impact", 
                      "Civilian_Casualties", "Estimated_Dollar_Loss", "Exposures", 
                      "Final_Incident_Type", "Fire_Alarm_System_Operation", 
-                     "Ignition_Source", "Initial_CAD_Event_Type", 
-                     "Material_First_Ignited", "Method_Of_Fire_Control", 
+                     "Ignition_Source", 
+                     "Material_First_Ignited", 
                      "Number_of_responding_apparatus", "Number_of_responding_personnel", 
-                     "Possible_Cause", "Smoke_Spread", "Sprinkler_System_Presence", 
+                     "Possible_Cause", "Sprinkler_System_Presence", 
                      "TFS_Alarm_Time", "TFS_Arrival_Time", "TFS_Firefighter_Casualties")
 
 clean_data <- raw_data[, columns_to_keep]
@@ -34,6 +34,10 @@ colnames(clean_data)
 head(clean_data, 6)
 summary(clean_data)   
 
+# Since I want to study possible sources leading to different severity of fire, no info about sources should be dropped
+clean_data <- clean_data %>%
+  filter(ignition_source != "999 - Undetermined")
+
 ### Ensure Datetime Consistency ###
 
 # Convert timestamps to POSIXct format (YYYY-MM-DD HH:MM:SS)
@@ -41,6 +45,7 @@ clean_data$tfs_alarm_time <- ymd_hms(clean_data$tfs_alarm_time)
 clean_data$tfs_arrival_time <- ymd_hms(clean_data$tfs_arrival_time) 
 clean_data <- clean_data[!is.na(clean_data$tfs_alarm_time), ]
 clean_data <- clean_data[!is.na(clean_data$tfs_arrival_time), ]
+
 
 
 ### Missing Value ###
@@ -51,19 +56,18 @@ missing_info <- data.frame(Column = names(missing_percentage),
                            Missing_Percentage = missing_percentage)
 print(missing_info)
 
-## Identify columns with more than 30% missing values and remove the columns
-cols_to_remove <- missing_info$Column[missing_info$Missing_Percentage > 30]
+## Identify columns with more than 20% missing values and remove the columns
+cols_to_remove <- missing_info$Column[missing_info$Missing_Percentage > 20]
 cols_to_remove
 
 # building_status, business_impact, and exposures are not super relevant to research topic, so just remove the columns
-# "fire_alarm_system_operation", "smoke_spread", "sprinkler_system_presence" are relavent, so keep it, replace NAs, by "unreported" 
+# "fire_alarm_system_operation" and "sprinkler_system_presence" are relavent, so keep it, replace NAs, by "unreported" 
 clean_data <- clean_data[, !(colnames(clean_data) 
                              %in% c("building_status", 
                                     "business_impact", 
                                     "exposures"))]
 
 cols_to_replace <- c("fire_alarm_system_operation", 
-                     "smoke_spread", 
                      "sprinkler_system_presence")
 clean_data[cols_to_replace] <- lapply(clean_data[cols_to_replace], 
                                       function(x) ifelse(is.na(x), 
