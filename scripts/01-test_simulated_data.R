@@ -231,3 +231,34 @@ if (invalid_time_sequence == 0) {
   message("Test Failed: There are ", invalid_time_sequence, 
           " cases where arrival time is before alarm time.")
 }
+
+
+# Check alarm time is in a realistic range
+min_alarm_time <- min(simulated_data$tfs_alarm_time, na.rm = TRUE)
+max_alarm_time <- max(simulated_data$tfs_alarm_time, na.rm = TRUE)
+expected_alarm_start <- as.POSIXct('2011-01-01')
+expected_alarm_end <- as.POSIXct('2024-11-30')
+
+if (min_alarm_time >= expected_alarm_start & max_alarm_time <= expected_alarm_end) {
+  message("Test Passed: Alarm times are within the realistic range.")
+} else {
+  message("Test Failed: Alarm times are outside the realistic range. ",
+          "Minimum: ", min_alarm_time, 
+          ", Maximum: ", max_alarm_time)
+}
+
+# Check arrival time is in a realistic range
+min_arrive_time <- min(simulated_data$tfs_arrival_time, na.rm = TRUE)
+max_arrive_time <- max(simulated_data$tfs_arrival_time, na.rm = TRUE)
+expected_arrive_start <- as.POSIXct('2011-01-01')
+expected_arrive_end <- as.POSIXct('2024-11-30')
+
+if (min_arrive_time >= expected_arrive_start & 
+    max_arrive_time <= expected_arrive_end) {
+  message(
+    "Test Passed: Arrival times are within the realistic range.")
+} else {
+  message("Test Failed: Arrival times are outside the realistic range. ",
+          "Minimum: ", min_arrive_time, 
+          ", Maximum: ", max_arrive_time)
+}
