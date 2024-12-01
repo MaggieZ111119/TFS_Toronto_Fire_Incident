@@ -1,89 +1,222 @@
 #### Preamble ####
-# Purpose: Tests the structure and validity of the simulated Australian 
-  #electoral divisions dataset.
-# Author: Rohan Alexander
-# Date: 26 September 2024
-# Contact: rohan.alexander@utoronto.ca
+# Purpose: Tests the structure and validity of the simulated TFS dataset 
+# Author: Maggie Zhang
+# Date: 30 November 2024
+# Contact: maggiey.zhang@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: 
   # - The `tidyverse` package must be installed and loaded
   # - 00-simulate_data.R must have been run
-# Any other information needed? Make sure you are in the `starter_folder` rproj
+  # - 03-clean_data.R must have been run
 
 
 #### Workspace setup ####
 library(tidyverse)
 
-analysis_data <- read_csv("data/00-simulated_data/simulated_data.csv")
+simulated_data <- read_csv("data/00-simulated_data/simulated_data.csv")
+analysis_data <- read_csv("data/02-analysis_data/tfs_analysis_data")
 
-# Test if the data was successfully loaded
-if (exists("analysis_data")) {
-  message("Test Passed: The dataset was successfully loaded.")
+# Test if the simulated data was successfully loaded
+if (exists("simulated_data")) {
+  message("Test Passed: The simulated dataset was successfully loaded.")
 } else {
-  stop("Test Failed: The dataset could not be loaded.")
+  stop("Test Failed: The simulated dataset could not be loaded.")
 }
 
 
-#### Test data ####
+### Test Simulated Data - Structure ###
 
-# Check if the dataset has 151 rows
-if (nrow(analysis_data) == 151) {
-  message("Test Passed: The dataset has 151 rows.")
+# Check if the simulated dataset has same number of rows as actual analysis data
+if (nrow(simulated_data) == nrow(analysis_data)) {
+  message("Test Passed: The simulated dataset has ", 
+          nrow(analysis_data), " rows.")
 } else {
-  stop("Test Failed: The dataset does not have 151 rows.")
+  message("Test Failed: The simulated dataset does not have ", 
+          nrow(analysis_data), 
+          " rows. It has ", nrow(simulated_data), " rows instead.")
 }
 
-# Check if the dataset has 3 columns
-if (ncol(analysis_data) == 3) {
-  message("Test Passed: The dataset has 3 columns.")
+# Check if the simulated dataset has same number of columns as actual analysis data
+if (ncol(simulated_data) == ncol(analysis_data)) {
+  message("Test Passed: The simulated dataset has ", 
+          ncol(analysis_data), " columns.")
 } else {
-  stop("Test Failed: The dataset does not have 3 columns.")
+  message("Test Failed: The simulated dataset does not have ", 
+          ncol(analysis_data), 
+          " columns. It has ", ncol(simulated_data), " columns. instead.")
 }
 
-# Check if all values in the 'division' column are unique
-if (n_distinct(analysis_data$division) == nrow(analysis_data)) {
-  message("Test Passed: All values in 'division' are unique.")
+
+### Test Simulated Data - Unique Rows###
+
+# Check if all values in the 'id' column are unique
+if (n_distinct(simulated_data$id) == nrow(simulated_data)) {
+  message("Test Passed: All values in 'id' are unique.")
 } else {
-  stop("Test Failed: The 'division' column contains duplicate values.")
+  stop("Test Failed: The 'id' column contains duplicate values.")
 }
 
-# Check if the 'state' column contains only valid Australian state names
-valid_states <- c("New South Wales", "Victoria", "Queensland", "South Australia", 
-                  "Western Australia", "Tasmania", "Northern Territory", 
-                  "Australian Capital Territory")
 
-if (all(analysis_data$state %in% valid_states)) {
-  message("Test Passed: The 'state' column contains only valid Australian state names.")
+### Test Simulated Data - Missing Values###
+
+# Check if any column in the dataset contains NA values
+if (any(is.na(simulated_data))) {
+  message("Test Failed: The simulated dataset contains NA values.")
 } else {
-  stop("Test Failed: The 'state' column contains invalid state names.")
+  message("Test Passed: The simulated dataset does not contain any NA values.")
 }
 
-# Check if the 'party' column contains only valid party names
-valid_parties <- c("Labor", "Liberal", "Greens", "National", "Other")
-
-if (all(analysis_data$party %in% valid_parties)) {
-  message("Test Passed: The 'party' column contains only valid party names.")
+# Check if any cell in the simulated dataset is NULL
+null_cells <- sapply(simulated_data, function(x) any(sapply(x, is.null)))
+if (any(null_cells)) {
+  message("Test Failed: Some cells in the simulated dataset are NULL.")
 } else {
-  stop("Test Failed: The 'party' column contains invalid party names.")
+  message("Test Passed: No cells in the simulated dataset are NULL.")
 }
 
-# Check if there are any missing values in the dataset
-if (all(!is.na(analysis_data))) {
-  message("Test Passed: The dataset contains no missing values.")
+
+### Test Simulated Data - Categorical Variables (Valid Categories)###
+
+# Check if area_of_origin columns contains only valid categories as in actual data
+valid_area_categories <- unique(analysis_data$fire_alarm_system_operation)
+
+if (all(simulated_data$fire_alarm_system_operation %in% valid_area_categories)) {
+  message("Test Passed: The 'fire_alarm_system_operation' column contains only valid categories as actual dataset.")
 } else {
-  stop("Test Failed: The dataset contains missing values.")
+  stop("Test Failed: The 'fire_alarm_system_operation' column contains invalid categories.")
 }
 
-# Check if there are no empty strings in 'division', 'state', and 'party' columns
-if (all(analysis_data$division != "" & analysis_data$state != "" & analysis_data$party != "")) {
-  message("Test Passed: There are no empty strings in 'division', 'state', or 'party'.")
+# Check if fire_alarm_system_operation contains only valid categories as in actual data
+valid_fire_alarm_categories <- unique(analysis_data$fire_alarm_system_operation)
+if (all(simulated_data$fire_alarm_system_operation %in% valid_fire_alarm_categories)) {
+  message("Test Passed: The 'fire_alarm_system_operation' column contains only valid categories.")
 } else {
-  stop("Test Failed: There are empty strings in one or more columns.")
+  stop("Test Failed: The 'fire_alarm_system_operation' column contains invalid categories.")
 }
 
-# Check if the 'party' column has at least two unique values
-if (n_distinct(analysis_data$party) >= 2) {
-  message("Test Passed: The 'party' column contains at least two unique values.")
+# Incident type
+valid_incident_type_categories <- unique(clean_data$final_incident_type)
+if (all(simulated_data$final_incident_type %in% valid_incident_type_categories)) {
+  message("Test Passed: The 'final_incident_type' column contains only valid categories.")
 } else {
-  stop("Test Failed: The 'party' column contains less than two unique values.")
+  stop("Test Failed: The 'final_incident_type' column contains invalid categories.")
 }
+
+# Ignition source
+valid_ignition_source_categories <- unique(analysis_data$ignition_source)
+if (all(simulated_data$ignition_source %in% valid_ignition_source_categories)) {
+  message("Test Passed: The 'ignition_source' column contains only valid categories.")
+} else {
+  stop("Test Failed: The 'ignition_source' column contains invalid categories.")
+}
+
+# Initial CAD event type
+valid_initial_cad_event_categories <- unique(analysis_data$initial_cad_event_type)
+if (all(simulated_data$initial_cad_event_type %in% valid_initial_cad_event_categories)) {
+  message("Test Passed: The 'initial_cad_event_type' column contains only valid categories.")
+} else {
+  stop("Test Failed: The 'initial_cad_event_type' column contains invalid categories.")
+}
+
+# Material first ignited
+valid_material_first_ignited_categories <- unique(analysis_data$material_first_ignited)
+if (all(simulated_data$material_first_ignited %in% valid_material_first_ignited_categories)) {
+  message("Test Passed: The 'material_first_ignited' column contains only valid categories.")
+} else {
+  stop("Test Failed: The 'material_first_ignited' column contains invalid categories.")
+}
+
+# Method of fire control
+valid_method_of_fire_control_categories <- unique(analysis_data$method_of_fire_control)
+if (all(simulated_data$method_of_fire_control %in% valid_method_of_fire_control_categories)) {
+  message("Test Passed: The 'method_of_fire_control' column contains only valid categories.")
+} else {
+  stop("Test Failed: The 'method_of_fire_control' column contains invalid categories.")
+}
+
+# Possible cause
+valid_possible_cause_categories <- unique(analysis_data$possible_cause)
+if (all(simulated_data$possible_cause %in% valid_possible_cause_categories)) {
+  message("Test Passed: The 'possible_cause' column contains only valid categories.")
+} else {
+  stop("Test Failed: The 'possible_cause' column contains invalid categories.")
+}
+
+# Smoke spread
+valid_smoke_spread_categories <- unique(analysis_data$smoke_spread)
+if (all(simulated_data$smoke_spread %in% valid_smoke_spread_categories)) {
+  message("Test Passed: The 'smoke_spread' column contains only valid categories.")
+} else {
+  stop("Test Failed: The 'smoke_spread' column contains invalid categories.")
+}
+
+# Sprinkler system presence
+valid_sprinkler_system_categories <- unique(analysis_data$sprinkler_system_presence)
+if (all(simulated_data$sprinkler_system_presence %in% valid_sprinkler_system_categories)) {
+  message("Test Passed: The 'sprinkler_system_presence' column contains only valid categories.")
+} else {
+  stop("Test Failed: The 'sprinkler_system_presence' column contains invalid categories.")
+}
+
+
+### Test Simulated Data - Numerical Variables (Positive Value)###
+
+# Check for negative values in 'civilian_casualties' column
+if (any(simulated_data$civilian_casualties < 0, na.rm = TRUE)) {
+  stop("Test Failed: There are negative values in the 'civilian_casualties' column.")
+} else {
+  message("Test Passed: No negative values in the 'civilian_casualties' column.")
+}
+
+# Check for negative values in 'estimated_dollar_loss' column
+if (any(simulated_data$estimated_dollar_loss < 0, na.rm = TRUE)) {
+  stop("Test Failed: There are negative values in the 'estimated_dollar_loss' column.")
+} else {
+  message("Test Passed: No negative values in the 'estimated_dollar_loss' column.")
+}
+
+# Check for negative values in 'number_of_responding_apparatus' column
+if (any(simulated_data$number_of_responding_apparatus < 0, na.rm = TRUE)) {
+  stop("Test Failed: There are negative values in the 'number_of_responding_apparatus' column.")
+} else {
+  message("Test Passed: No negative values in the 'number_of_responding_apparatus' column.")
+}
+
+# Check for negative values in 'number_of_responding_personnel' column
+if (any(simulated_data$number_of_responding_personnel < 0, na.rm = TRUE)) {
+  stop("Test Failed: There are negative values in the 'number_of_responding_personnel' column.")
+} else {
+  message("Test Passed: No negative values in the 'number_of_responding_personnel' column.")
+}
+
+# Check for negative values in 'tfs_firefighter_casualties' column
+if (any(simulated_data$tfs_firefighter_casualties < 0, na.rm = TRUE)) {
+  stop("Test Failed: There are negative values in the 'tfs_firefighter_casualties' column.")
+} else {
+  message("Test Passed: No negative values in the 'tfs_firefighter_casualties' column.")
+}
+
+# Check for negative values in 'response_time' column
+if (any(simulated_data$response_time < 0, na.rm = TRUE)) {
+  stop("Test Failed: There are negative values in the 'response_time' column.")
+} else {
+  message("Test Passed: No negative values in the 'response_time' column.")
+}
+
+
+### Test Simulated Data - Date-Time Variables (Format)###
+
+# Check if 'tfs_alarm_time' follows the correct format
+if (any(is.na(as.POSIXct(simulated_data$tfs_alarm_time, format = "%Y-%m-%d %H:%M:%S", tz = "UTC")))) {
+  stop("Test Failed: Invalid date format in the 'tfs_alarm_time' column.")
+} else {
+  message("Test Passed: Date format is valid in the 'tfs_alarm_time' column.")
+}
+
+# Check if 'tfs_arrival_time' follows the correct format
+if (any(is.na(as.POSIXct(simulated_data$tfs_arrival_time, format = "%Y-%m-%d %H:%M:%S", tz = "UTC")))) {
+  stop("Test Failed: Invalid date format in the 'tfs_arrival_time' column.")
+} else {
+  message("Test Passed: Date format is valid in the 'tfs_arrival_time' column.")
+}
+
