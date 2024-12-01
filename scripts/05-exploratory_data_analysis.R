@@ -19,7 +19,7 @@ library(knitr)
 #### Read data ####
 fire_data <- read.csv("data/02-analysis_data/tfs_analysis_data")
 
-### Data Overview ###
+#### Data Overview ####
 # Structure
 head(fire_data)
 str(fire_data)
@@ -29,24 +29,189 @@ missing_data <- colSums(is.na(fire_data))
 print(missing_data)
 
 
-### Plot/Summary distribution of all Variables ###
-## 1. Civilian Casualties (Numerical)
+#### Plot/Summary distribution of all Variables ####
+## 1. Area of Origin (Categorical) ##
+all_area <- unique(fire_data$area_of_origin)
+# List of Area of Origin
+area_of_origin <- c("22 - Sleeping Area or Bedroom (inc. patients room, dormitory, etc)", 
+                    "55 - Mechanical/Electrical Services Room", 
+                    "28 - Office", 
+                    "24 - Cooking Area or Kitchen", 
+                    "81 - Engine Area", 
+                    "25 - Washroom or Bathroom (toilet, restroom/locker room)", 
+                    "73 - Parking Area, Parking Lot", 
+                    "44 - Trash, Rubbish Storage (inc garbage chute room, garbage/industr", 
+                    "50 - Basement/cellar (not partitioned)", 
+                    "64 - Porch or Balcony", 
+                    "78 - Attached Deck", 
+                    "86 - Passenger Area", 
+                    "52 - HVAC Equipment Room (furnace room, water heater closet, boiler)", 
+                    "21 - Living Area (e.g. living, TV, recreation, etc)", 
+                    "61 - Exterior Wall", 
+                    "62 - Roof", 
+                    "12 - Hallway, Corridor", 
+                    "83 - Electrical Systems", 
+                    "59 - Utility Shaft (eg. electrical wiring/phone, etc.)", 
+                    "79 - Other Outside Area", 
+                    "75 - Trash, rubbish area (outside)", 
+                    "89 - Other Vehicle Area", 
+                    "31 - Process Manufacturing (inc manf, prod assembly, repair)", 
+                    "53 - Chimney/Flue Pipe", 
+                    "26 - Sauna", 
+                    "99 - Undetermined (formerly 98)", 
+                    "87 - Trunk/Cargo Area", 
+                    "11 - Lobby, Entranceway", 
+                    "97 - Other - unclassified", 
+                    "67 - Concealed Floor Area", 
+                    "58 - Ducting - Exhaust (inc cooking, fumes, etc.)", 
+                    "29 - Electronic Equipment", 
+                    "51 - Elevator (includes shaft)", 
+                    "46 - Product Storage (inc products or materials awaiting manuf, assembly)", 
+                    "33 - Laboratory", 
+                    "84 - Fuel Systems (eg. fuel tank, etc.)", 
+                    "27 - Laundry Area", 
+                    "69 - Attic Area", 
+                    "45 - Supply Storage Room (inc maintenance/office/document storage, et", 
+                    "30 - Sales, Showroom Area", 
+                    "42 - Garage", 
+                    "66 - Concealed Ceiling Area", 
+                    "49 - Other Storage Area", 
+                    "13 - Stairway, Escalator", 
+                    "39 - Other Functional Area", 
+                    "71 - Open Area (inc lawn, field, farmyard, park, playing field, pier)", 
+                    "93 - Residential/Business: Other business area", 
+                    "72 - Court, Patio, Terrace", 
+                    "74 - Storage Area (outside)", 
+                    "56 - Conveyor Shaft or Chute (inc dumbwaiter, laundry chute, garbage", 
+                    "23 - Dining or Beverage Area (inc mess, canteen, lunchroom, cafeteria", 
+                    "92 - Residential/Business: Restaurant area", 
+                    "63 - Awning or Canopy", 
+                    "68 - Concealed Wall Area", 
+                    "41 - Closet (eg. clothes, broom, linen closet, etc.)", 
+                    "82 - Running Gear (inc wheels and braking systems, transmission system", 
+                    "60 - Other Building Services/Support Facilities", 
+                    "85 - Operator/Control Area", 
+                    "990 - Under Investigation", 
+                    "43 - Locker (apartment storage)", 
+                    "57 - Ducting - Heating, Air Conditioning", 
+                    "70 - Other Structural Area", 
+                    "35 - Performance Area (inc stage, rink, boxing ring, gym floor, altar)", 
+                    "65 - Crawl Space (includes sub-structure)", 
+                    "91 - Multiple Areas of Origin", 
+                    "18 - Covered Court, Atrium, mall concourse", 
+                    "36 - Backstage, dressing room", 
+                    "32 - Assembly Area (inc school room, spectator area, church, etc)", 
+                    "19 - Other Means of Egress", 
+                    "47 - Shipping/Receiving/Loading Platform", 
+                    "34 - Operating Room, Treatment or Examination Area", 
+                    "76 - Fuel Dispensing Area (outside)", 
+                    "48 - Records storage area (inc vaults)", 
+                    "54 - Incinerator Room")
+
+# Create a function to categorize area of origin
+categorize_area_of_origin <- function(area) {
+  # Residential and Living Spaces
+  if (grepl("Bedroom|Living Area|Dormitory|Hallway|Lobby|Basement|Closet|Sauna", area)) {
+    return("Residential and Living Spaces")
+  } 
+  # Cooking and Dining Areas
+  else if (grepl("Kitchen|Dining|Canteen|Lunchroom|Mess", area)) {
+    return("Cooking and Dining Areas")
+  } 
+  # Office and Workspace
+  else if (grepl("Office|Workspace|Lobby|Showroom|Laboratory|Assembly Area", area)) {
+    return("Office and Workspace")
+  } 
+  # Mechanical, HVAC, and Electrical Areas
+  else if (grepl("Mechanical|Electrical|HVAC|Boiler|Furnace", area)) {
+    return("Mechanical, HVAC, and Electrical Areas")
+  } 
+  # Storage and Utility Areas
+  else if (grepl("Storage|Concealed|Shaft|Utility|Warehouse|Garage", area)) {
+    return("Storage and Utility Areas")
+  } 
+  # Outdoor and Exterior Areas
+  else if (grepl("Parking|Exterior|Deck|Porch|Lawn|Field|Pier|Terrace", area)) {
+    return("Outdoor and Exterior Areas")
+  } 
+  # Vehicle and Transport Areas
+  else if (grepl("Vehicle|Trunk|Cargo|Engine|Garage", area)) {
+    return("Vehicle and Transport Areas")
+  } 
+  # Specialized Rooms
+  else if (grepl("Bathroom|Laundry|Shower|Incinerator|Sauna|Elevator", area)) {
+    return("Specialized Rooms")
+  } 
+  # Industrial and Manufacturing Areas
+  else if (grepl("Manufacturing|Assembly|Fuel Systems|Conveyor|Chute", area)) {
+    return("Industrial and Manufacturing Areas")
+  } 
+  
+  # Public and Performance Spaces
+  else if (grepl("Stage|Rink|Gym|Performance|Concourse|Court", area)) {
+    return("Public and Performance Spaces")
+  } 
+  # Miscellaneous and Unclassified
+  else {
+    return("Miscellaneous and Unclassified")
+  }
+}
+# Apply the categorization function to each area of origin
+fire_data$area_of_origin_grouped <- sapply(fire_data$area_of_origin, 
+                                           categorize_area_of_origin)
+table(fire_data$area_of_origin_grouped)
+# Plot
+ggplot(fire_data, aes(x = area_of_origin_grouped)) +
+  geom_bar(fill = "red") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Area of Origin Distribution") +
+  xlab("Area of Origin") +
+  ylab("Frequency") +
+  geom_text(stat = "count", aes(label = ..count..), vjust = 0.5)
+
+
+## 2. Civilian Casualties (Numerical) ##
 #Overall Table
 civilian_casualties_df <- as.data.frame(table(fire_data$civilian_casualties))
 colnames(civilian_casualties_df) <- c("Number_of_Casualties", "Frequency")
 civilian_casualties_df
 # Summary table
 summary(fire_data$civilian_casualties)
+#Plot
+ggplot(fire_data, aes(x = X_id, y = civilian_casualties)) +
+  geom_point(color = "darkgreen", size = 2, shape = 16) +
+  theme_minimal() +
+  ggtitle("Scatterplot of Number of Responding Personnel vs. Incident ID") +
+  xlab("Incident ID") +
+  ylab("Civilian Casualties")
 
-### 2. Estimated Dollar Loss (Numerical)
+
+## 3. Estimated Dollar Loss (Numerical) ##
 #Overall Table
 est_loss_df <- as.data.frame(table(fire_data$estimated_dollar_loss))
 colnames(est_loss_df) <- c("Estimated of Loss", "Frequency")
 est_loss_df
 # Summary table
 summary(fire_data$estimated_dollar_loss)
+#Plot
 
-### 3. Fire Alarm System Operation (Categorical)
+
+## 4. Final Incident Type (Categorical) ##
+# Plot
+ggplot(fire_data, aes(x = final_incident_type)) +
+  geom_bar(fill = "purple") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Final Incident Type Distribution") +
+  xlab("Final Incident Type") +
+  ylab("Frequency") +
+  geom_text(stat = "count", aes(label = ..count..), vjust = 0.5)
+#table
+table(fire_data$final_incident_type)
+
+
+## 5. Fire Alarm System Operation (Categorical) ##
 # Plot
 ggplot(fire_data, aes(x = fire_alarm_system_operation)) +
   geom_bar(fill = "blue") +
@@ -59,10 +224,10 @@ ggplot(fire_data, aes(x = fire_alarm_system_operation)) +
 #Table
 table(fire_data$fire_alarm_system_operation)
 
-# 4. Ignition Source (Categorical)
-# Create a data frame with the ignition source codes and their descriptions
-# List of ignition sources
-ignition_sources <- c("999 - Undetermined", "51 - Incandescent Lamp - Light Bulb, Spotlight", 
+
+## 6. Ignition Source (Categorical) ##
+all_sources <- unique(fire_data$ignition_source)
+ignition_sources <- c("51 - Incandescent Lamp - Light Bulb, Spotlight", 
                       "23 - Distribution Equipment (includes panel boards, fuses, circuit br)", 
                       "41 - Other Heating Equipment", "11 - Stove, Range-top burner", 
                       "82 - Vehicle - Mechanical", "24 - Circuit Wiring - Copper", 
@@ -108,59 +273,71 @@ ignition_sources <- c("999 - Undetermined", "51 - Incandescent Lamp - Light Bulb
 
 # Create a function to categorize sources
 categorize_ignition_sources <- function(source) {
-  if (grepl("999", source)) {
-    return("Undetermined")
-  } else if (grepl("Lamp|Lighting|Electrical|Cable|Wire", source)) {
+  # Lighting and Electrical Equipment
+  if (grepl("Lamp|Lighting|Electrical|Cable|Wire|Ballast|Transformer", source)) {
     return("Lighting and Electrical Equipment")
-  } else if (grepl("Stove|Oven|Microwave|Grill|Fryer|Heater", source)) {
+  } 
+  # Cooking and Heating Equipment
+  else if (grepl("Stove|Oven|Microwave|Grill|Fryer|Heater|Range", source)) {
     return("Cooking and Heating Equipment")
-  } else if (grepl("Fire|Matches|Candle|Blow Torch|Flame", source)) {
+  } 
+  # Fire-related and Open Flame
+  else if (grepl("Fire|Matches|Candle|Flame|Torch|Burner|Smoker", source)) {
     return("Fire-related and Open Flame")
-  } else if (grepl("Chemical|Explosion|Flammable", source)) {
+  } 
+  # Flammable Materials and Chemicals
+  else if (grepl("Chemical|Explosion|Flammable|Rekindle|Static|Spark", source)) {
     return("Flammable Materials and Chemicals")
-  } else if (grepl("Mechanical|Vehicle", source)) {
+  } 
+  # Mechanical Equipment
+  else if (grepl("Mechanical|Vehicle|Collision|Smokers|Blower", source)) {
     return("Mechanical Equipment")
-  } else if (grepl("Transformer|Service|Utility|Distribution", source)) {
+  } 
+  # Electrical Distribution and Utility
+  else if (grepl("Distribution|Service|Utility|Panel|Circuit", source)) {
     return("Electrical Distribution and Utility")
-  } else if (grepl("Static|Spark", source)) {
+  } 
+  
+  # Static Electricity and Sparks
+  else if (grepl("Spark|Static", source)) {
     return("Static Electricity and Sparks")
-  } else if (grepl("Exposure", source)) {
+  } 
+  # Exposure to Fire and Environmental
+  else if (grepl("Exposure|Outside|Container|Fireplace|Campfire|Wildland", source)) {
     return("Exposure to Fire and Environmental")
-  } else if (grepl("Processing|Furnace|Kiln", source)) {
+  } 
+  # Processing Equipment (Industrial)
+  else if (grepl("Furnace|Kiln|Processing|Incinerator", source)) {
     return("Processing Equipment")
-  } else if (grepl("Clothes|Washing Machine|Refrigerator", source)) {
+  } 
+  # Appliances
+  else if (grepl("Appliance|Refrigerator|Washing Machine|Dryer|Iron", source)) {
     return("Appliances")
-  } else if (grepl("Vehicle|Collision", source)) {
+  } 
+  
+  # Vehicle and Accidents
+  else if (grepl("Vehicle|Accident|Collision", source)) {
     return("Vehicle and Accidents")
-  } else if (grepl("Multiple|Arson", source)) {
+  } 
+  # Multiple Ignition Sources (or suspected arson)
+  else if (grepl("Multiple|Arson", source)) {
     return("Multiple Ignition Sources")
-  } else if (grepl("Cooling|Air Conditioner", source)) {
+  } 
+  # Cooling and Air Conditioning Equipment
+  else if (grepl("Cooling|Air Conditioner", source)) {
     return("Cooling and Air Conditioning Equipment")
-  } else {
+  } 
+  # Other (for anything that doesn't fit into the above categories)
+  else {
     return("Other")
   }
 }
-
 # Apply the categorization function to each ignition source
-categorized_sources <- sapply(ignition_sources, categorize_ignition_sources)
-
-# Create a data frame with the original and categorized sources
-result <- data.frame(ignition_source = ignition_sources, category = categorized_sources)
-
-# Summarize the grouped categories
-summary <- table(result$category)
-
-# Display the result summary
-view(summary)
-
-
-# View the first few rows of the data frame
-head(ignition_sources)
-
-
-# Table
+fire_data$ignition_source_grouped <- sapply(fire_data$ignition_source, categorize_ignition_sources)
+#Table
 table(fire_data$ignition_source_grouped)
-# Plot
+#Plot
+# Plot of grouped ignition source distribution
 ggplot(fire_data, aes(x = ignition_source_grouped)) +
   geom_bar(fill = "green") +
   theme_minimal() + 
@@ -168,4 +345,169 @@ ggplot(fire_data, aes(x = ignition_source_grouped)) +
   ggtitle("Grouped Ignition Source Distribution") +
   xlab("Ignition Source Group") +
   ylab("Frequency") +
-  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5) 
+  geom_text(stat = "count", aes(label = ..count..), vjust = 0.5)
+
+
+## 7. Number of Responding Apparatus (Numerical) ##
+ggplot(fire_data, aes(x = number_of_responding_apparatus)) +
+  geom_histogram(bins = 30, fill = "cyan", color = "black") +
+  theme_minimal() +
+  ggtitle("Number of Responding Apparatus Distribution") +
+  xlab("Number of Responding Apparatus") +
+  ylab("Frequency") +
+  stat_bin(aes(label = ..count..), geom = "text", vjust = -0.5, size = 3)
+#ScatterPlot
+ggplot(fire_data, aes(x = X_id, y = number_of_responding_apparatus)) +
+  geom_point(color = "darkorange", size = 2, shape = 16) +
+  theme_minimal() +
+  ggtitle("Scatterplot of Number of Responding apparatus vs. Incident ID") +
+  xlab("Incident ID") +
+  ylab("Number of Responding apparatus")
+#Summary table
+summary(fire_data$number_of_responding_apparatus)
+
+
+# 8. Number of Responding Personnel (Numerical) ##
+#Plot
+ggplot(fire_data, aes(x = number_of_responding_personnel)) +
+  geom_histogram(bins = 30, fill = "yellow", color = "black") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Number of Responding Personnel Distribution") +
+  xlab("Number of Responding Personnel") +
+  ylab("Frequency") +
+  stat_bin(aes(label = ..count..), geom = "text", vjust = 0.5, size = 3)
+#ScatterPlot
+ggplot(fire_data, aes(x = X_id, y = number_of_responding_personnel)) +
+  geom_point(color = "orange", size = 2, shape = 16) +
+  theme_minimal() +
+  ggtitle("Scatterplot of Number of Responding Personnel vs. Incident ID") +
+  xlab("Incident ID") +
+  ylab("Number of Responding Personnel")
+#Summary table
+summary(fire_data$number_of_responding_personnel)
+
+
+## 9. Possible Cause ##
+#plot all that hsa frequency greater than 550
+filtered_data <- fire_data %>%
+  count(possible_cause) %>%
+  filter(n > 550)
+ggplot(filtered_data, aes(x = possible_cause, y = n)) +
+  geom_bar(stat = "identity", fill = "blue") +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Possible Cause") +
+  xlab("Possible Cause") +
+  ylab("Frequency") +
+  geom_text(aes(label = n), vjust = -0.5)
+#Full Tabble
+cause_table <- table(fire_data$possible_cause)
+cause_table_df <- as.data.frame(cause_table) %>%
+  arrange(desc(Freq))
+kable(cause_table_df, col.names = c("Possible Cause", "Frequency"), 
+             caption = "Frequency of Possible Causes (Descending Order)", 
+             format = "markdown")
+
+## 11. Sprinkler System Presence (Categorical) ##
+#Plot
+ggplot(fire_data, aes(x = sprinkler_system_presence)) +
+  geom_bar(fill = "blue") +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Sprinkler System Presence") +
+  xlab("Sprinkler System Presence") +
+  ylab("Frequency") +
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5)
+#Table
+table(fire_data$sprinkler_system_presence)
+
+
+## 12. tfs_alarm_time ## 
+fire_data$year <- year(fire_data$tfs_alarm_time)
+fire_data$month <- month(fire_data$tfs_alarm_time)
+fire_data$month <- as.numeric(fire_data$month)
+
+# Plot Number of Incidents by Year
+ggplot(fire_data, aes(x = year)) +
+  geom_bar(fill = "lightblue", color = "black") +
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5, size = 3) + 
+  labs(title = "Fire Incidents by Year", x = "Year", y = "Incident Count") +
+  theme_minimal() +
+  scale_x_continuous(breaks = seq(min(fire_data$year), max(fire_data$year), by = 1))
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# from year plot, we can see that 2022 and 2023 does not provide much information so we can droped them.
+fire_data_filtered <- fire_data %>%
+  filter(!is.na(year) & !is.na(month) & month >= 1 & month <= 12)
+incident_count_by_year_month <- fire_data_filtered %>%
+  group_by(year, month) %>%
+  summarize(count = n(), .groups = 'drop')
+incident_count_by_year_month_ex <- incident_count_by_year_month %>%
+  filter(!(year %in% c(2022, 2023)))
+incident_count_by_year_month_ex$month <- factor(incident_count_by_year_month_ex$month, levels = 1:12)
+ggplot(incident_count_by_year_month_ex, aes(x = month, y = count)) +
+  geom_bar(stat = "identity", fill = "lightcoral", color = "black") +
+  labs(title = "Fire Incidents by Month and Year", x = "Month", y = "Incident Count") +
+  scale_x_discrete(
+    breaks = 1:12,  # Show all months (1 to 12)
+    labels = month.name  # Use full month names
+  ) +
+  facet_wrap(~year, scales = "fixed") +  # Fix the y-axis scale for comparison
+  theme_minimal() +
+  theme(
+    strip.text.x = element_text(size = 10), 
+    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1.5, size = 8), 
+    axis.title.x = element_text(size = 12), 
+    axis.title.y = element_text(size = 12), 
+    strip.background = element_rect(fill = "lightblue", color = "black"), 
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
+  )
+
+# Table
+incident_table <- incident_count_by_year_month %>%
+  pivot_wider(names_from = month, values_from = count, values_fill = 0)
+
+# Print the table
+view(incident_table)
+
+
+## 13. tfs_arrival_time ##
+
+
+## 14. Firefighter Casualties (Numerical) ##
+ggplot(fire_data, aes(x = tfs_firefighter_casualties)) +
+  geom_histogram(bins = 30, fill = "pink", color = "black") +
+  theme_minimal() +
+  ggtitle("Firefighter Casualties Distribution") +
+  xlab("Firefighter Casualties") +
+  ylab("Frequency")
+casualties_table <- table(fire_data$tfs_firefighter_casualties)
+casualties_df <- as.data.frame(casualties_table)
+# Plot the pie chart
+ggplot(casualties_df, aes(x = "", y = Freq, fill = factor(Var1))) +
+  geom_bar(stat = "identity", width = 1, color = "black") +
+  coord_polar(theta = "y") +
+  theme_void() +
+  ggtitle("Distribution of Firefighter Casualties") +
+  scale_fill_manual(values = c("pink", "lightblue", "lightgreen", "orange")) +
+  labs(fill = "Casualties")
+#table
+table(fire_data$tfs_firefighter_casualties)
+
+## 15. Response Time (Numerical) ##
+#Plot
+ggplot(fire_data, aes(x = response_time)) +
+  geom_histogram(bins = 30, fill = "lightgreen", color = "black") +
+  theme_minimal() +
+  ggtitle("Response Time Distribution") +
+  xlab("Response Time (minutes)") +
+  ylab("Frequency") +
+  stat_bin(aes(label = ..count..), geom = "text", vjust = 0.5, size = 3) +
+  xlim(0, 15) 
+#Summary Table
+summary(fire_data$response_time)
+
+
+
