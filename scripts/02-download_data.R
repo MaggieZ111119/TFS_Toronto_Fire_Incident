@@ -21,6 +21,6 @@ raw_tfs_fire <- read_csv(file = "https://ckan0.cf.opendata.inter.prod-toronto.ca
 
 #### Save data ####
 # Save the data to the repository
-write_csv(raw_tfs_fire, "/data/raw_fire_data.csv") 
+write_csv(raw_tfs_fire, "data/01-raw_data/raw_fire_data.csv") 
 
          
