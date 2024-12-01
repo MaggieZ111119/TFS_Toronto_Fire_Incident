@@ -23,13 +23,29 @@ n_simulated <- nrow(clean_data)
 # civilian_casualties, use Poisson distribution for count data
 simulated_civilian_casualties <- rpois(n_simulated, 
                                        mean(clean_data$civilian_casualties,
-                                            na.rm = TRUE))  
-# Estimated lost, use Normal distribution for continuous data
-simulated_estimated_dollar_loss <- rnorm(n_simulated, 
-                                         mean(clean_data$estimated_dollar_loss, 
-                                              na.rm = TRUE), 
-                                         sd(clean_data$estimated_dollar_loss, 
-                                            na.rm = TRUE))
+                                            na.rm = TRUE)) 
+
+# Estimated lost, use Log-normal distribution, with adjustment to mean and sd.
+clean_data_no_na <- clean_data$estimated_dollar_loss[
+  !is.na(clean_data$estimated_dollar_loss) & 
+    clean_data$estimated_dollar_loss > 0]
+log_mean <- log(mean(clean_data_no_na))
+log_sd <- sd(log(clean_data_no_na))
+simulated_estimated_dollar_loss <- rlnorm(
+  n_simulated, meanlog = log_mean, sdlog = log_sd)
+# Adjust the distribution to get a more realistic mean and quantiles
+target_mean <- mean(clean_data$estimated_dollar_loss, na.rm = TRUE)
+simulated_estimated_dollar_loss <- simulated_estimated_dollar_loss * 
+  (target_mean / mean(simulated_estimated_dollar_loss))
+# Apply truncation based on the original data's max value
+max_loss <- max(clean_data$estimated_dollar_loss, na.rm = TRUE)
+simulated_estimated_dollar_loss <- 
+  pmin(simulated_estimated_dollar_loss, max_loss)
+# Ensure the same proportion of zero values as in the original data
+zero_percentage <- mean(clean_data$estimated_dollar_loss == 0, na.rm = TRUE)
+simulated_estimated_dollar_loss[
+  sample(1:n_simulated, size = round(zero_percentage * n_simulated))] <- 0
+
 # Number of responsing apparatus, use random number that range from 1 to 50.
 simulated_number_of_responding_apparatus <- sample(1:50, n_simulated, 
                                                    replace = TRUE)  
