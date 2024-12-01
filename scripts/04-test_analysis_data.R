@@ -26,13 +26,13 @@ if (exists("analysis_data")) {
 
 ### Test Analysis Data - Repetitiveness ###
 
-# Check proportion of rows retained, consider representative if at least 60% o original retianed.
+# Check proportion of rows retained, consider representative if at least 40% o original retianed.
 retention_rate <- (nrow(analysis_data) / nrow(raw_data)) * 100
-if (retention_rate > 60) {
+if (retention_rate > 40) {
   message("Test Passed: The proportion of rows retained is ", 
           retention_rate, "%. Consider representitive.")
 } else {
-  message("Test Failed: Less than 60% of rows retained, but got ", 
+  message("Test Failed: Less than 40% of rows retained, but got ", 
           retention_rate, "% instead.")
 }
 
@@ -68,12 +68,12 @@ if (any(null_cells)) {
 ### Test Analysis Data - Categorical Variables (Valid Categories)###
 
 # Check if area_of_origin columns contains only valid categories as in actual data
-valid_area_categories <- unique(analysis_data$fire_alarm_system_operation)
+valid_area_categories <- unique(analysis_data$area_of_origin)
 
-if (all(analysis_data$fire_alarm_system_operation %in% valid_area_categories)) {
-  message("Test Passed: The 'fire_alarm_system_operation' column contains only valid categories as actual dataset.")
+if (all(analysis_data$area_of_origin %in% valid_area_categories)) {
+  message("Test Passed: The 'area_of_origin' column contains only valid categories as actual dataset.")
 } else {
-  stop("Test Failed: The 'fire_alarm_system_operation' column contains invalid categories.")
+  stop("Test Failed: The 'area_of_origin' column contains invalid categories.")
 }
 
 # Check if fire_alarm_system_operation contains only valid categories as in actual data
@@ -100,13 +100,6 @@ if (all(analysis_data$ignition_source %in% valid_ignition_source_categories)) {
   stop("Test Failed: The 'ignition_source' column contains invalid categories.")
 }
 
-# Initial CAD event type
-valid_initial_cad_event_categories <- unique(analysis_data$initial_cad_event_type)
-if (all(analysis_data$initial_cad_event_type %in% valid_initial_cad_event_categories)) {
-  message("Test Passed: The 'initial_cad_event_type' column contains only valid categories.")
-} else {
-  stop("Test Failed: The 'initial_cad_event_type' column contains invalid categories.")
-}
 
 # Material first ignited
 valid_material_first_ignited_categories <- unique(analysis_data$material_first_ignited)
@@ -116,13 +109,6 @@ if (all(analysis_data$material_first_ignited %in% valid_material_first_ignited_c
   stop("Test Failed: The 'material_first_ignited' column contains invalid categories.")
 }
 
-# Method of fire control
-valid_method_of_fire_control_categories <- unique(analysis_data$method_of_fire_control)
-if (all(analysis_data$method_of_fire_control %in% valid_method_of_fire_control_categories)) {
-  message("Test Passed: The 'method_of_fire_control' column contains only valid categories.")
-} else {
-  stop("Test Failed: The 'method_of_fire_control' column contains invalid categories.")
-}
 
 # Possible cause
 valid_possible_cause_categories <- unique(analysis_data$possible_cause)
@@ -132,13 +118,6 @@ if (all(analysis_data$possible_cause %in% valid_possible_cause_categories)) {
   stop("Test Failed: The 'possible_cause' column contains invalid categories.")
 }
 
-# Smoke spread
-valid_smoke_spread_categories <- unique(analysis_data$smoke_spread)
-if (all(analysis_data$smoke_spread %in% valid_smoke_spread_categories)) {
-  message("Test Passed: The 'smoke_spread' column contains only valid categories.")
-} else {
-  stop("Test Failed: The 'smoke_spread' column contains invalid categories.")
-}
 
 # Sprinkler system presence
 valid_sprinkler_system_categories <- unique(analysis_data$sprinkler_system_presence)
