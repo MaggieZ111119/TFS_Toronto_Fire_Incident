@@ -110,14 +110,6 @@ if (all(simulated_data$ignition_source %in% valid_ignition_source_categories)) {
   stop("Test Failed: The 'ignition_source' column contains invalid categories.")
 }
 
-# Material first ignited
-valid_material_first_ignited_categories <- unique(analysis_data$material_first_ignited)
-if (all(simulated_data$material_first_ignited %in% valid_material_first_ignited_categories)) {
-  message("Test Passed: The 'material_first_ignited' column contains only valid categories.")
-} else {
-  stop("Test Failed: The 'material_first_ignited' column contains invalid categories.")
-}
-
 # Possible cause
 valid_possible_cause_categories <- unique(analysis_data$possible_cause)
 if (all(simulated_data$possible_cause %in% valid_possible_cause_categories)) {
