@@ -19,8 +19,7 @@ raw_data <- read_csv("data/01-raw_data/raw_fire_data.csv")
 columns_to_keep <- c("_id", "Area_of_Origin", "Building_Status", "Business_Impact", 
                      "Civilian_Casualties", "Estimated_Dollar_Loss", "Exposures", 
                      "Final_Incident_Type", "Fire_Alarm_System_Operation", 
-                     "Ignition_Source", 
-                     "Material_First_Ignited", 
+                     "Ignition_Source",
                      "Number_of_responding_apparatus", "Number_of_responding_personnel", 
                      "Possible_Cause", "Sprinkler_System_Presence", 
                      "TFS_Alarm_Time", "TFS_Arrival_Time", "TFS_Firefighter_Casualties")
