@@ -262,3 +262,19 @@ if (min_arrive_time >= expected_arrive_start &
           "Minimum: ", min_arrive_time, 
           ", Maximum: ", max_arrive_time)
 }
+
+
+### Check for Unreasonable zeros ###
+# Check for zero values in 'response_time'
+if (any(simulated_data$response_time == 0, na.rm = TRUE)) {
+  stop("Test Failed: Zero values found in the 'response_time' column.")
+} else {
+  message("Test Passed: No zero values in the 'response_time' column.")
+}
+
+# Check for zero values in 'id'
+if (any(simulated_data$id == 0, na.rm = TRUE)) {
+  stop("Test Failed: Zero values found in the 'id' column.")
+} else {
+  message("Test Passed: No zero values in the 'id' column.")
+}
