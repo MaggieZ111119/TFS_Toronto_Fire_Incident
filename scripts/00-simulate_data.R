@@ -101,8 +101,6 @@ simulated_data <- data.frame(
   fire_alarm_system_operation = simulated_fire_alarm_system_operation,
   ignition_source = sample(unique(clean_data$ignition_source), 
                            n_simulated, replace = TRUE),
-  material_first_ignited = sample(unique(clean_data$material_first_ignited), 
-                                  n_simulated, replace = TRUE),
   number_of_responding_apparatus = simulated_number_of_responding_apparatus,
   number_of_responding_personnel = sample(10:50, 
                                           n_simulated, replace = TRUE),
