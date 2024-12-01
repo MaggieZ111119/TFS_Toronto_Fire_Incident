@@ -204,7 +204,7 @@ if (any(simulated_data$response_time < 0, na.rm = TRUE)) {
 }
 
 
-### Test Simulated Data - Date-Time Variables (Format)###
+### Test Simulated Data - Date-Time Variables (Format and Consistency)###
 
 # Check if 'tfs_alarm_time' follows the correct format
 if (any(is.na(as.POSIXct(simulated_data$tfs_alarm_time, format = "%Y-%m-%d %H:%M:%S", tz = "UTC")))) {
@@ -220,3 +220,14 @@ if (any(is.na(as.POSIXct(simulated_data$tfs_arrival_time, format = "%Y-%m-%d %H:
   message("Test Passed: Date format is valid in the 'tfs_arrival_time' column.")
 }
 
+# Check if all arrival times occur after alarm times
+invalid_time_sequence <- 
+  sum(simulated_data$tfs_arrival_time < simulated_data$tfs_alarm_time, 
+      na.rm = TRUE)
+
+if (invalid_time_sequence == 0) {
+  message("Test Passed: All arrival times occur after alarm times.")
+} else {
+  message("Test Failed: There are ", invalid_time_sequence, 
+          " cases where arrival time is before alarm time.")
+}
