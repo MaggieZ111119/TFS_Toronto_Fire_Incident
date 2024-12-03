@@ -18,19 +18,38 @@ library(xgboost)
 fire_data_model <- read_csv("data/02-analysis_data/severity_tfs_analysis_data")
 
 #### Prepare Data ####
-fire_data_model$area_of_origin_grouped <- as.factor(fire_data_model$area_of_origin_grouped)
-fire_data_model$ignition_source_grouped <- as.factor(fire_data_model$ignition_source_grouped)
-fire_data_model$month <- as.factor(fire_data_model$month)
 
-# Encode the target variable (Severity) as a binary outcome for severity (high = 1, others = 0)
 fire_data_model <- fire_data_model %>%
-  mutate(Severity_high = ifelse(Severity == "High", 1, 0))
+  mutate(Severity_high = as.factor(ifelse(Severity == "High", 1, 0)))
+
 fire_data_model <- fire_data_model[, c(
   "area_of_origin_grouped", 
   "ignition_source_grouped", 
-  "month",
-  "Severity_high"
+  "Severity_high",
+  "month"
 )]
+fire_data_model$month <- as.factor(fire_data_model$month)
+fire_data_model_origin_encoded <- model.matrix(~ area_of_origin_grouped - 1, data = fire_data_model)
+fire_data_model_source_encoded <- model.matrix(~ ignition_source_grouped - 1, data = fire_data_model)
+
+fire_data_model <- cbind(fire_data_model, fire_data_model_source_encoded, fire_data_model_origin_encoded)
+
+fire_data_model <- fire_data_model %>%
+  rename_all(~ gsub(" ", "_", .)) %>%
+  rename_all(~ gsub("-", "_", .)) %>%
+  rename_all(~ gsub(",", "_", .)) %>%
+  rename_all(~ gsub(":", "_", .))
+
+
+library(randomForest)
+# Fit random forest model
+rf_model <- randomForest(Severity_high ~ ., data = fire_data_model, importance = TRUE)
+
+# Print the model summary
+print(rf_model)
+
+# View feature importance
+importance(rf_model)
 
 
 #Split into test and trannig set
@@ -39,43 +58,21 @@ trainIndex <- createDataPartition(fire_data_model$Severity_high, p = 0.8, list =
 train_data <- fire_data_model[trainIndex, ]
 test_data <- fire_data_model[-trainIndex, ]
 
-train_matrix <- model.matrix(Severity_high ~ . - 1, data = train_data)
-test_matrix <- model.matrix(Severity_high ~ . - 1, data = test_data)
+### Model (Logistic) Traning####
+table(train_data$Severity_high)
+weights <- ifelse(train_data$Severity_high == 1, 10, 1)
 
-### Model (XGBoost) Traning####
+logit_model <- glm(Severity_high ~ ., data = train_data, family = binomial, weights = weights)
+summary(logit_model)
 
-xgb_model <- xgboost(data = train_matrix, label = train_data$Severity_high, 
-                     objective = "binary:logistic", 
-                     nrounds = 100, 
-                     max_depth = 6, 
-                     eta = 0.3, 
-                     subsample = 0.8, 
-                     colsample_bytree = 0.8, 
-                     eval_metric = "logloss")
-
-# View model summary
-print(xgb_model)
-
-#### Model Evalaution ####
-predictions <- predict(xgb_model, test_matrix)
-predictions_class <- factor(predictions_class, levels = levels(factor(test_data$Severity_high)))
-conf_matrix <- confusionMatrix(predictions_class, factor(test_data$Severity_high))
-print(conf_matrix)
-
-
-# ROC Curve
-library(ROCR)
-pred <- prediction(predictions, test_data$Severity_high)
-perf <- performance(pred, "tpr", "fpr")
-x11()  # Open a new graphics window
-plot(perf, main = "ROC Curve", col = "blue", lwd = 2)
-
-# Plot feature importance
-
-importance_data <- xgb.importance(model = xgb_model)
-
-xgb.plot.importance(importance_data, top_n = 10)
-
+## Drop paramter based on p-vlaue ##
+model_updated <- glm(
+  Severity_high ~ 
+    
+    data = train_data,  # Replace 'your_data' with your actual data frame
+  family = binomial(link = "logit")
+)
+summary(model_updated)
 
 
 
