@@ -647,6 +647,22 @@ fire_data %>%
        x = "Month", y = "Average Response Time (minutes)") +
   theme_minimal()
 
+
+##number of responding apparatus and the Financial dollar loss ##
+fire_data$Log_Dollar_Loss <- log(fire_data$estimated_dollar_loss + 1)
+
+# Scatter plot between number of responding apparatus and final dollar loss
+ggplot(fire_data, aes(y = number_of_responding_apparatus, x = Log_Dollar_Loss)) +
+  geom_point(color = 'blue', alpha = 0.5) +
+  labs(title = 'Number of Responding Apparatus vs Log of Final Dollar Loss',
+       x = 'Number of Responding Apparatus',
+       y = 'Log of Final Dollar Loss') +
+  theme_minimal()
+
+cor(fire_data$Log_Dollar_Loss, fire_data$number_of_responding_apparatus, use = "complete.obs")
+
+
+
 #### Response Time Understanding####
 ## Outliers ##
 # Calculate IQR for response_time
@@ -697,5 +713,30 @@ ggplot(fire_data_clean_loss, aes(x = estimated_dollar_loss)) +
   scale_x_continuous(labels = scales::comma) +  # Format axis labels with commas
   theme_minimal()
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+####
 
 
