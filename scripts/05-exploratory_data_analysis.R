@@ -470,7 +470,7 @@ incident_table <- incident_count_by_year_month %>%
   pivot_wider(names_from = month, values_from = count, values_fill = 0)
 
 # Print the table
-view(incident_table)
+# View(incident_table)
 
 
 ## 13. tfs_arrival_time ##
@@ -508,6 +508,10 @@ ggplot(fire_data, aes(x = response_time)) +
   xlim(0, 15) 
 #Summary Table
 summary(fire_data$response_time)
+
+#### Save new analysis data ####
+fire_data$total_casualties <- fire_data$civilian_casualties + fire_data$tfs_firefighter_casualties
+write_csv(fire_data, "data/02-analysis_data/updated_tfs_analysis_data")
 
 
 #### Understand Potential Indicators of Severity ####
@@ -716,27 +720,5 @@ ggplot(fire_data_clean_loss, aes(x = estimated_dollar_loss)) +
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-####
 
 
