@@ -510,4 +510,192 @@ ggplot(fire_data, aes(x = response_time)) +
 summary(fire_data$response_time)
 
 
+#### Understand Potential Indicators of Severity ####
+## Flag High-Severity Incident##
+# Define thresholds (example: $30000 loss or 5+ casualties)
+fire_data$high_severity <- ifelse(fire_data$estimated_dollar_loss > 50000 | fire_data$total_casualties >= 5, "High", "Low")
+# Count of High vs. Low severity
+table(fire_data$high_severity)
+
+# Bar chart of high vs. low severity
+ggplot(fire_data, aes(x = high_severity, fill = high_severity)) +
+  geom_bar() +
+  labs(
+    title = "Count of High vs. Low Severity Incidents",
+    x = "Severity Level",
+    y = "Count"
+  ) +
+  scale_fill_manual(values = c("High" = "darkblue", "Low" = "darkgreen")) +
+  theme_minimal()
+
+## Financial loss vs. Casualties ##
+fire_data$total_casualties <- fire_data$civilian_casualties + fire_data$tfs_firefighter_casualties
+
+#heatmap
+fire_data <- fire_data %>%
+  mutate(
+    loss_group = cut(
+      estimated_dollar_loss,
+      breaks = c(0, 1000, 10000, 50000, 500000, Inf),
+      labels = c("<1k", "1k-10k", "10k-50k", "50k-500k", ">500k"),
+      right = FALSE
+    ),
+    casualty_group = cut(
+      total_casualties,
+      breaks = c(0, 1, 2, 5, Inf),
+      labels = c("0", "1", "2-5", ">5"),
+      right = FALSE
+    )
+  )
+
+severity_table <- fire_data %>%
+  group_by(loss_group, casualty_group) %>%
+  summarize(count = n())
+
+ggplot(severity_table, aes(x = loss_group, y = casualty_group, fill = count)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  labs(
+    title = "Heatmap of Financial Loss and Casualty Groups",
+    x = "Financial Loss Group",
+    y = "Casualty Group",
+    fill = "Incident Count"
+  ) +
+  theme_minimal()
+
+# scatter
+ggplot(fire_data, aes(x = as.factor(total_casualties), y = estimated_dollar_loss)) +
+  geom_boxplot(fill = "skyblue", outlier.color = "red") +
+  labs(
+    title = "Financial Loss by Number of Casualties",
+    x = "Casualties Count",
+    y = "Estimated Dollar Loss"
+  ) +
+  theme_minimal() +
+  scale_y_continuous(labels = scales::dollar_format())
+
+
+##Area of Origin vs. Financial Loss ##
+# Summarize data by area_of_origin_grouped
+severity_by_area <- fire_data %>%
+  group_by(area_of_origin_grouped) %>%
+  summarize(
+    avg_loss = mean(estimated_dollar_loss, na.rm = TRUE),
+  )
+
+# Reshape for plotting
+severity_long_are <- severity_by_area %>%
+  tidyr::pivot_longer(cols = c(avg_loss), names_to = "metric", values_to = "value")
+
+# Bar chart
+ggplot(severity_long_are, aes(x = reorder(area_of_origin_grouped, value), y = value, fill = metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(labels = scales::comma) +
+  coord_flip() +
+  labs(
+    title = "Severity by Area of Origin",
+    x = "Area of Origin",
+    y = "Average Value",
+    fill = "Severity Metric"
+  ) +
+  theme_minimal()
+
+
+##Ignition Source vs. Financial Loss ##
+severity_by_source <- fire_data %>%
+  group_by(ignition_source_grouped) %>%
+  summarize(
+    avg_loss = mean(estimated_dollar_loss, na.rm = TRUE),
+  )
+# Reshape for plotting
+severity_long_source <- severity_by_area %>%
+  tidyr::pivot_longer(cols = c(avg_loss), names_to = "metric", values_to = "value")
+# Bar chart
+ggplot(severity_long_source, aes(x = reorder(area_of_origin_grouped, value), y = value, fill = metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(labels = scales::comma) +
+  coord_flip() +
+  labs(
+    title = "Severity by Ignition Source",
+    x = "Ignition Source",
+    y = "Average Value",
+    fill = "Severity Metric"
+  ) +
+  theme_minimal()
+
+
+#### Correlations ####
+# Boxplot for response time by area of origin
+response_summary <- fire_data %>%
+  group_by(area_of_origin_grouped) %>%
+  summarize(avg_response_time = mean(response_time, na.rm = TRUE))
+# Bar plot
+ggplot(response_summary, aes(x = area_of_origin_grouped, y = avg_response_time)) +
+  geom_col(fill = "skyblue", color = "black") +
+  labs(title = "Average Response Time by Area of Origin",
+       x = "Area of Origin", y = "Average Response Time (minutes)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+##Line plot for average response time over months##
+fire_data %>%
+  group_by(month) %>%
+  summarize(avg_response_time = mean(response_time, na.rm = TRUE)) %>%
+  ggplot(aes(x = month, y = avg_response_time)) +
+  geom_line(color = "blue", size = 1) +
+  geom_point(color = "red", size = 2) +
+  labs(title = "Average Response Time by Month",
+       x = "Month", y = "Average Response Time (minutes)") +
+  theme_minimal()
+
+#### Response Time Understanding####
+## Outliers ##
+# Calculate IQR for response_time
+Q1 <- quantile(fire_data$response_time, 0.25, na.rm = TRUE)
+Q3 <- quantile(fire_data$response_time, 0.75, na.rm = TRUE)
+IQR_value <- Q3 - Q1
+
+# Define upper and lower bounds
+lower_bound <- Q1 - 1.5 * IQR_value
+upper_bound <- Q3 + 1.5 * IQR_value
+
+# Filter out outliers
+fire_data_clean <- fire_data %>%
+  filter(response_time >= lower_bound & response_time <= upper_bound)
+
+# Histogram after removing outliers
+ggplot(fire_data_clean, aes(x = response_time)) +
+  geom_histogram(binwidth = 1, fill = "skyblue", color = "black") +
+  labs(
+    title = "Distribution of Response Times (Cleaned Data)",
+    x = "Response Time (minutes)",
+    y = "Frequency"
+  ) +
+  theme_minimal()
+
+## Response time vs financial loss  ##
+# Calculate IQR for estimated_dollar_loss
+Q1_loss <- quantile(fire_data$estimated_dollar_loss, 0.25, na.rm = TRUE)
+Q3_loss <- quantile(fire_data$estimated_dollar_loss, 0.75, na.rm = TRUE)
+IQR_loss <- Q3_loss - Q1_loss
+
+# Define upper and lower bounds for estimated dollar loss
+lower_bound_loss <- Q1_loss - 1.5 * IQR_loss
+upper_bound_loss <- Q3_loss + 1.5 * IQR_loss
+
+# Filter out outliers for estimated dollar loss
+fire_data_clean_loss <- fire_data_clean %>%
+  filter(estimated_dollar_loss >= lower_bound_loss & estimated_dollar_loss <= upper_bound_loss)
+
+# Histogram after removing outliers for estimated dollar loss
+ggplot(fire_data_clean_loss, aes(x = estimated_dollar_loss)) +
+  geom_histogram(binwidth = 5000, fill = "lightgreen", color = "black") +
+  labs(
+    title = "Distribution of Estimated Dollar Loss (Cleaned Data)",
+    x = "Estimated Dollar Loss",
+    y = "Frequency"
+  ) +
+  scale_x_continuous(labels = scales::comma) +  # Format axis labels with commas
+  theme_minimal()
+
+
 
