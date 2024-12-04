@@ -19,60 +19,41 @@ fire_data_model <- read_csv("data/02-analysis_data/severity_tfs_analysis_data")
 
 #### Prepare Data ####
 
-fire_data_model <- fire_data_model %>%
-  mutate(Severity_high = as.factor(ifelse(Severity == "High", 1, 0)))
-
 fire_data_model <- fire_data_model[, c(
   "area_of_origin_grouped", 
   "ignition_source_grouped", 
-  "Severity_high",
+  "Severity",
   "month"
 )]
-fire_data_model$month <- as.factor(fire_data_model$month)
-fire_data_model_origin_encoded <- model.matrix(~ area_of_origin_grouped - 1, data = fire_data_model)
-fire_data_model_source_encoded <- model.matrix(~ ignition_source_grouped - 1, data = fire_data_model)
 
-fire_data_model <- cbind(fire_data_model, fire_data_model_source_encoded, fire_data_model_origin_encoded)
-
-fire_data_model <- fire_data_model %>%
-  rename_all(~ gsub(" ", "_", .)) %>%
-  rename_all(~ gsub("-", "_", .)) %>%
-  rename_all(~ gsub(",", "_", .)) %>%
-  rename_all(~ gsub(":", "_", .))
-
-
-library(randomForest)
-# Fit random forest model
-rf_model <- randomForest(Severity_high ~ ., data = fire_data_model, importance = TRUE)
-
-# Print the model summary
-print(rf_model)
-
-# View feature importance
-importance(rf_model)
-
-
-#Split into test and trannig set
-set.seed(123)
-trainIndex <- createDataPartition(fire_data_model$Severity_high, p = 0.8, list = FALSE)
+trainIndex <- createDataPartition(fire_data_model$Severity, p = 0.8, list = FALSE)
 train_data <- fire_data_model[trainIndex, ]
 test_data <- fire_data_model[-trainIndex, ]
 
-### Model (Logistic) Traning####
-table(train_data$Severity_high)
-weights <- ifelse(train_data$Severity_high == 1, 10, 1)
+train_data$Severity <- factor(train_data$Severity, levels = c("Low", "Medium", "High"))
 
-logit_model <- glm(Severity_high ~ ., data = train_data, family = binomial, weights = weights)
-summary(logit_model)
-
-## Drop paramter based on p-vlaue ##
-model_updated <- glm(
-  Severity_high ~ 
-    
-    data = train_data,  # Replace 'your_data' with your actual data frame
-  family = binomial(link = "logit")
+tune_grid <- expand.grid(
+  mtry = c(2, 3, 4)# Number of variables randomly selected at each split
 )
-summary(model_updated)
+
+train_control <- trainControl(method = "cv", number = 5)
+# Calculate weight
+freq <- table(train_data$Severity)
+class_weights <- 1 / freq
+class_weights
+
+tuned_rf_model <- train(Severity ~ area_of_origin_grouped + ignition_source_grouped + month, 
+                        data = train_data, 
+                        method = "rf", 
+                        trControl = train_control, 
+                        tuneGrid = tune_grid, 
+                        importance = TRUE, 
+                        classwt = c(0.0000892618, 0.0024271845 , 0.0119047619))  
+
+print(rf_model)
+
+rf_predictions <- predict(rf_model, newdata = test_data)
+table(Predicted = rf_predictions, Actual = test_data$Severity)
 
 
 
