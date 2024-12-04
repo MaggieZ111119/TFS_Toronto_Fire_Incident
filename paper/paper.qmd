@@ -16,9 +16,15 @@ bibliography: references.bib
 #| include: false
 #| warning: false
 #| message: false
-
 library(tidyverse)
-library(palmerpenguins)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(lubridate)
+library(knitr)
+
+fire_data <- read.csv(here::here("~/TFS_Toronto_Fire_Incident/data/02-analysis_data/tfs_analysis_data"))
+
 ```
 
 # Introduction
@@ -116,21 +122,157 @@ Kept variables: The remaining variables are essential for the completeness of th
 -   **Sprinkler_System_Presence**: This is also an important variable for understanding fire safety. Given that there are fewer variables under "Safety Infrastructure," it is essential to retain them.
 
 To maintain data quality, rows with more than 30% missing data are removed. After ensuring that there are no missing values in the dataset, a new variable, Response_Time, is created to calculate the time difference (in minutes) between TFS_Alarm_Time and TFS_Arrival_Time. This new variable will help analyze fire response efficiency and is a key indicator for the study.
-
-Some of our data is of penguins (@fig-bills), from @palmerpenguins.
+(@fig-area-origin-distribution).
 
 ```{r}
-#| label: fig-bills
-#| fig-cap: Bills of penguins
+#| label: fig-area-origin-distribution
+#| fig-cap: Distribution of the Area of Origin for fire incidents, categorized into various groups such as Residential, Office, Mechanical, and Industrial areas. The plot highlights the frequency of each area category, helping to understand the distribution of fire origins.
 #| echo: false
 
-ggplot(penguins, aes(x = island, fill = species)) +
-  geom_bar(alpha = 0.8) +
-  scale_fill_manual(values = c("darkorange","purple","cyan4"),
-                    guide = "none") +
+all_area <- unique(fire_data$area_of_origin)
+# List of Area of Origin
+area_of_origin <- c("22 - Sleeping Area or Bedroom (inc. patients room, dormitory, etc)", 
+#| echo: false
+
+all_area <- unique(fire_data$area_of_origin)
+# List of Area of Origin
+area_of_origin <- c("22 - Sleeping Area or Bedroom (inc. patients room, dormitory, etc)", 
+                    "55 - Mechanical/Electrical Services Room", 
+                    "28 - Office", 
+                    "24 - Cooking Area or Kitchen", 
+                    "81 - Engine Area", 
+                    "25 - Washroom or Bathroom (toilet, restroom/locker room)", 
+                    "73 - Parking Area, Parking Lot", 
+                    "44 - Trash, Rubbish Storage (inc garbage chute room, garbage/industr", 
+                    "50 - Basement/cellar (not partitioned)", 
+                    "64 - Porch or Balcony", 
+                    "78 - Attached Deck", 
+                    "86 - Passenger Area", 
+                    "52 - HVAC Equipment Room (furnace room, water heater closet, boiler)", 
+                    "21 - Living Area (e.g. living, TV, recreation, etc)", 
+                    "61 - Exterior Wall", 
+                    "62 - Roof", 
+                    "12 - Hallway, Corridor", 
+                    "83 - Electrical Systems", 
+                    "59 - Utility Shaft (eg. electrical wiring/phone, etc.)", 
+                    "79 - Other Outside Area", 
+                    "75 - Trash, rubbish area (outside)", 
+                    "89 - Other Vehicle Area", 
+                    "31 - Process Manufacturing (inc manf, prod assembly, repair)", 
+                    "53 - Chimney/Flue Pipe", 
+                    "26 - Sauna", 
+                    "99 - Undetermined (formerly 98)", 
+                    "87 - Trunk/Cargo Area", 
+                    "11 - Lobby, Entranceway", 
+                    "97 - Other - unclassified", 
+                    "67 - Concealed Floor Area", 
+                    "58 - Ducting - Exhaust (inc cooking, fumes, etc.)", 
+                    "29 - Electronic Equipment", 
+                    "51 - Elevator (includes shaft)", 
+                    "46 - Product Storage (inc products or materials awaiting manuf, assembly)", 
+                    "33 - Laboratory", 
+                    "84 - Fuel Systems (eg. fuel tank, etc.)", 
+                    "27 - Laundry Area", 
+                    "69 - Attic Area", 
+                    "45 - Supply Storage Room (inc maintenance/office/document storage, et", 
+                    "30 - Sales, Showroom Area", 
+                    "42 - Garage", 
+                    "66 - Concealed Ceiling Area", 
+                    "49 - Other Storage Area", 
+                    "13 - Stairway, Escalator", 
+                    "39 - Other Functional Area", 
+                    "71 - Open Area (inc lawn, field, farmyard, park, playing field, pier)", 
+                    "93 - Residential/Business: Other business area", 
+                    "72 - Court, Patio, Terrace", 
+                    "74 - Storage Area (outside)", 
+                    "56 - Conveyor Shaft or Chute (inc dumbwaiter, laundry chute, garbage", 
+                    "23 - Dining or Beverage Area (inc mess, canteen, lunchroom, cafeteria", 
+                    "92 - Residential/Business: Restaurant area", 
+                    "63 - Awning or Canopy", 
+                    "68 - Concealed Wall Area", 
+                    "41 - Closet (eg. clothes, broom, linen closet, etc.)", 
+                    "82 - Running Gear (inc wheels and braking systems, transmission system", 
+                    "60 - Other Building Services/Support Facilities", 
+                    "85 - Operator/Control Area", 
+                    "990 - Under Investigation", 
+                    "43 - Locker (apartment storage)", 
+                    "57 - Ducting - Heating, Air Conditioning", 
+                    "70 - Other Structural Area", 
+                    "35 - Performance Area (inc stage, rink, boxing ring, gym floor, altar)", 
+                    "65 - Crawl Space (includes sub-structure)", 
+                    "91 - Multiple Areas of Origin", 
+                    "18 - Covered Court, Atrium, mall concourse", 
+                    "36 - Backstage, dressing room", 
+                    "32 - Assembly Area (inc school room, spectator area, church, etc)", 
+                    "19 - Other Means of Egress", 
+                    "47 - Shipping/Receiving/Loading Platform", 
+                    "34 - Operating Room, Treatment or Examination Area", 
+                    "76 - Fuel Dispensing Area (outside)", 
+                    "48 - Records storage area (inc vaults)", 
+                    "54 - Incinerator Room")
+
+# Create a function to categorize area of origin
+categorize_area_of_origin <- function(area) {
+  # Residential and Living Spaces
+  if (grepl("Bedroom|Living Area|Dormitory|Hallway|Lobby|Basement|Closet|Sauna", area)) {
+    return("Residential and Living Spaces")
+  } 
+  # Cooking and Dining Areas
+  else if (grepl("Kitchen|Dining|Canteen|Lunchroom|Mess", area)) {
+    return("Cooking and Dining Areas")
+  } 
+  # Office and Workspace
+  else if (grepl("Office|Workspace|Lobby|Showroom|Laboratory|Assembly Area", area)) {
+    return("Office and Workspace")
+  } 
+  # Mechanical, HVAC, and Electrical Areas
+  else if (grepl("Mechanical|Electrical|HVAC|Boiler|Furnace", area)) {
+    return("Mechanical, HVAC, and Electrical Areas")
+  } 
+  # Storage and Utility Areas
+  else if (grepl("Storage|Concealed|Shaft|Utility|Warehouse|Garage", area)) {
+    return("Storage and Utility Areas")
+  } 
+  # Outdoor and Exterior Areas
+  else if (grepl("Parking|Exterior|Deck|Porch|Lawn|Field|Pier|Terrace", area)) {
+    return("Outdoor and Exterior Areas")
+  } 
+  # Vehicle and Transport Areas
+  else if (grepl("Vehicle|Trunk|Cargo|Engine|Garage", area)) {
+    return("Vehicle and Transport Areas")
+  } 
+  # Specialized Rooms
+  else if (grepl("Bathroom|Laundry|Shower|Incinerator|Sauna|Elevator", area)) {
+    return("Specialized Rooms")
+  } 
+  # Industrial and Manufacturing Areas
+  else if (grepl("Manufacturing|Assembly|Fuel Systems|Conveyor|Chute", area)) {
+    return("Industrial and Manufacturing Areas")
+  } 
+  
+  # Public and Performance Spaces
+  else if (grepl("Stage|Rink|Gym|Performance|Concourse|Court", area)) {
+    return("Public and Performance Spaces")
+  } 
+  # Miscellaneous and Unclassified
+  else {
+    return("Miscellaneous and Unclassified")
+  }
+}
+# Apply the categorization function to each area of origin
+fire_data$area_of_origin_grouped <- sapply(fire_data$area_of_origin, 
+                                           categorize_area_of_origin)
+# Plot
+ggplot(fire_data, aes(x = area_of_origin_grouped)) +
+  geom_bar(fill = "red") +
   theme_minimal() +
-  facet_wrap(~species, ncol = 1) +
-  coord_flip()
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Area of Origin Distribution") +
+  xlab("Area of Origin") +
+  ylab("Frequency") +
+  geom_text(stat = "count", aes(label = ..count..), vjust = 0.5)
+
+
 ```
 
 ```{r}
