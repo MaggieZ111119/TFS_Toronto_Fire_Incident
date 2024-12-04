@@ -19,47 +19,61 @@ fire_data_model <- read_csv("data/02-analysis_data/severity_tfs_analysis_data")
 
 #### Prepare Data ####
 
+fire_data_model <- fire_data_model %>%
+  mutate(Severity_high = as.factor(ifelse(Severity == "High", 1, 0)))
+
 fire_data_model <- fire_data_model[, c(
   "area_of_origin_grouped", 
   "ignition_source_grouped", 
-  "Severity",
-  "month"
+  "Severity_high"
 )]
 
-trainIndex <- createDataPartition(fire_data_model$Severity, p = 0.8, list = FALSE)
+fire_data_model$ignition_source_grouped <- as.factor(fire_data_model$ignition_source_grouped)
+fire_data_model$area_of_origin_grouped <- as.factor(fire_data_model$area_of_origin_grouped)
+
+fire_data_model$ignition_source_grouped <- gsub(" ", "_", fire_data_model$ignition_source_grouped)
+fire_data_model$area_of_origin_grouped <- gsub(",", "_", fire_data_model$area_of_origin_grouped)
+fire_data_model$area_of_origin_grouped <- gsub(" ", "_", fire_data_model$area_of_origin_grouped)
+fire_data_model$area_of_origin_grouped <- gsub("__", "_", fire_data_model$area_of_origin_grouped)
+
+
+trainIndex <- createDataPartition(fire_data_model$Severity_high, p = 0.8, list = FALSE)
 train_data <- fire_data_model[trainIndex, ]
 test_data <- fire_data_model[-trainIndex, ]
 
-train_data$Severity <- factor(train_data$Severity, levels = c("Low", "Medium", "High"))
+### Model (Logistic) Traning####
+logistic_model <- glm(Severity_high ~ area_of_origin_grouped + ignition_source_grouped, data = train_data, family = binomial)
+summary(logistic_model)
 
-tune_grid <- expand.grid(
-  mtry = c(2, 3, 4)# Number of variables randomly selected at each split
-)
 
-train_control <- trainControl(method = "cv", number = 5)
-# Calculate weight
-freq <- table(train_data$Severity)
-class_weights <- 1 / freq
-class_weights
+## Drop paramter based on p-vlaue ##
+# Check for correaltion
+library(car)
+vif(logistic_model)
 
-tuned_rf_model <- train(Severity ~ area_of_origin_grouped + ignition_source_grouped + month, 
-                        data = train_data, 
-                        method = "rf", 
-                        trControl = train_control, 
-                        tuneGrid = tune_grid, 
-                        importance = TRUE, 
-                        classwt = c(0.0000892618, 0.0024271845 , 0.0119047619))  
+# Update the model to keep only significant variables
+updated_model <- glm(Severity_high ~ area_of_origin_grouped, 
+                     data = train_data, family = binomial)
 
-print(rf_model)
+# Check the summary of the updated model
+summary(updated_model)
 
-rf_predictions <- predict(rf_model, newdata = test_data)
-table(Predicted = rf_predictions, Actual = test_data$Severity)
+# AIC improved, model better
 
+
+
+
+#### Model Evaluation ####
+library(pROC)
+predicted_probs <- predict(updated_model, test_data, type = "response")
+roc_curve <- roc(test_data$Severity_high, predicted_probs)
+x11()
+plot(roc_curve)
 
 
 #### Save model ####
 saveRDS(
-  first_model,
-  file = "models/first_model.rds"
+  updated_model,
+  file = "models/logtsic_model.rds"
 )
 
