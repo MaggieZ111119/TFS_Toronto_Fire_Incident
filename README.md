@@ -2,30 +2,29 @@
 
 ## Overview
 
-This repo will study different severity catalogues of Toronto fire incidence by finance and casualty loss, and support efficient resource allocation of fire response to Toronto Fire Service(TFS).
-
+This Repo contain study investigates fire severity levels in Toronto to improve resource allocation for Toronto Fire Services (TFS). The analysis identifies that higher-severity incidents are strongly correlated with incidents originating from mechanical, HVAC,
+and electrical areas, while cooking and lighting areas tend to lead to lower severity
+fires. The study also finds that fire incidents involving certain ignition sources,
+such as electrical units or lightning equipment, are more likely to be severe. Additionally, severe fires are associated with greater financial losses and higher casualty
+rates, affecting both civilians and firefighters. These insights can guide TFS to
+enhance response times, prioritize resources, and optimize fire response operations,
+ultimately improving community safety in Toronto.
 
 ## File Structure
 
 The repo is structured as:
 
--   `data/raw_data` contains the raw data as obtained from Open Data Toronto: Fire Incidents: https://open.toronto.ca/dataset/fire-incidents/
--   `data/analysis_data` contains the cleaned dataset that was constructed.
+-   `data/01-raw_data` contains the raw data as obtained from Open Data Toronto: Fire Incidents: https://open.toronto.ca/dataset/fire-incidents/
+-   `data/02-analysis_data` contains the cleaned dataset that was constructed,and also a dataset created for analysis in EDA Process.
 -   `model` contains fitted models. 
--   `other` contains relevant literature, details about LLM chat interactions, and sketches.
+-   `other` contains details about LLM chat interactions, and sketches of the data planning.
 -   `paper` contains the files used to generate the paper, including the Quarto document and reference bibliography file, as well as the PDF of the paper. 
--   `scripts` contains the R scripts used to simulate, download and clean data.
+-   `scripts` contains the R scripts used to simulate, download and clean data. Also included scripts used for model puddling, result stud.
 
 
 ## Statement on LLM usage
 
-Aspects of the paper are written with the help of ChatGPT and the full chat history is available in `other/llms/usage.txt`.
+Aspects of the paper are written with the help of ChatGPT4.0 and the full chat history is available in `other/llms/usage.txt`.
 
 
-## Some checks
 
-- [ ] Change the rproj file name so that it's not starter_folder.Rproj
-- [ ] Change the README title so that it's not Starter folder
-- [ ] Remove files that you're not using
-- [ ] Update comments in R scripts
-- [ ] Remove this checklist
