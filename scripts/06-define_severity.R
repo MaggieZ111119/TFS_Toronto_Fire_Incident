@@ -82,6 +82,8 @@ fire_data_model <- fire_data_model %>%
 #### Save Data ####
 write_csv(fire_data_model, "data/02-analysis_data/severity_tfs_analysis_data")
 
+fire_data_model <- read_csv("data/02-analysis_data/severity_tfs_analysis_data")
+
 
 #### Understand what is related to Severity ####
 
