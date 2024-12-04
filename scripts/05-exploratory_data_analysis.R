@@ -1,11 +1,11 @@
 #### Preamble ####
-# Purpose: Explore data of variables in interest and plot them
-# Author: Maggie Zhang 
+# Purpose: Explore data of variables of interest and visualize their distributions
+# Author: Maggie Zhang
 # Date: 30 November 2024
 # Contact: maggiey.zhang@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
+# Pre-requisites: R version 4.0 or higher, installed packages: dplyr, ggplot2, tidyr, lubridate, knitr
+# Any other information needed: This script analyzes fire incident data from the TFS dataset. It categorizes and visualizes variables such as Area of Origin, Civilian Casualties, Estimated Dollar Loss, Final Incident Type, Fire Alarm System Operation, and others.
 
 
 #### Workspace setup ####

@@ -1,11 +1,11 @@
 #### Preamble ####
-# Purpose: Models... [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 11 February 2023 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
+# Purpose: The purpose of this script is to analyze fire incident data, specifically quantifying severity based on multiple factors such as the number of responding apparatus, estimated dollar loss, and total casualties. The script also explores the relationships between severity and ignition sources, as well as the area of origin, through various visualizations.
+# Author: Maggie Zhang
+# Date: 02 December 2023
+# Contact: maggiey.zhang@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
+# Pre-requisites: Required libraries include 'tidyverse', 'rstanarm', 'rpart', 'ggplot2', 'dplyr', 'tidyr', and 'fitdistrplus'. Ensure these packages are installed.
+# Any other information needed? The dataset used here is fire incident data, and the focus is on classifying the severity of incidents based on multiple features, followed by visualizing relationships between severity and other factors.
 
 
 #### Workspace setup ####

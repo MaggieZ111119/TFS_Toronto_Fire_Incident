@@ -4,7 +4,7 @@
 # Date: 29 November 2024
 # Contact: maggiey.zhang@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: Plan data ans simulated
+# Pre-requisites: Plan data and simulated
 # Any other information needed? NO
 
 

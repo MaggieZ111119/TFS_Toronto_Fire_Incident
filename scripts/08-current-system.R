@@ -1,11 +1,11 @@
 #### Preamble ####
-# Purpose: Models... [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 11 February 2023 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
+# Purpose: Analyze and visualize the relationship between fire incident severity and factors such as fire alarm system operation and sprinkler system presence. Includes creating stacked bar plots and separate plots to explore the proportional distribution and counts by severity.
+# Author: Maggie Zhang
+# Date: 02 December 2023
+# Contact: maggiey.zhang@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
+# Pre-requisites: tidyverse, rstanarm, rpart, ggplot2, dplyr, tidyr, fitdistrplus
+# Any other information needed? The analysis involves creating visualizations to explore the distribution of fire alarm and sprinkler system statuses by severity.
 
 
 #### Workspace setup ####

@@ -1,11 +1,11 @@
 #### Preamble ####
-# Purpose: Replicated graphs from... [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 11 February 2023 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
+# Purpose: Replicated graphs and models for analyzing severity of fire incidents based on various factors, including ignition source and area of origin.
+# Author: Maggie Zhang
+# Date: 02 December 2023
+# Contact: maggiey.zhang@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
+# Pre-requisites: tidyverse, dplyr, caret, xgboost, car, pROC
+# Any other information needed? The analysis involves logistic regression modeling to predict severity based on categorical variables, followed by model evaluation using ROC curves.
 
 
 #### Workspace setup ####
