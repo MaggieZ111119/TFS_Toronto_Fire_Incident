@@ -6,7 +6,7 @@ author:
 thanks: "Code and data are available at: [https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident](https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident)."
 date: today
 date-format: long
-abstract: "This study investigates different severity levels of Toronto fire incidents based on financial and casualty losses to support efficient resource allocation for Toronto Fire Service (TFS). The analysis reveals that higher-severity incidents correlate with greater financial losses and more significant human casualties, impacting both civilians and firefighters. The study identifies high-priority response criteria, including incidents originating from XXXX regions, occurring within defined time frames: XXXX, and involving XXXX as the ignition sources. These insights, derived from the modeling analysis, can guide TFS to enhance response times and prioritize tasks based on common high-risk indicators. This work aims to inform decision-making and optimize fire response operations to improve community safety in Toronto."
+abstract: "This study investigates different severity levels of Toronto fire incidents to support efficient resource allocation for Toronto Fire Service (TFS). The analysis reveals that higher-severity incidents correlate with greater financial losses and more significant human casualties, impacting both civilians and firefighters. The study identifies high-priority response criteria, including incidents originating from XXXX regions, occurring within defined time frames: XXXX, and involving XXXX as the ignition sources. These insights, derived from the modeling analysis, can guide TFS to enhance response times and prioritize tasks based on common high-risk indicators. This work aims to inform decision-making and optimize fire response operations to improve community safety in Toronto."
 format: pdf
 number-sections: true
 bibliography: references.bib
@@ -21,15 +21,13 @@ library(tidyverse)
 library(palmerpenguins)
 ```
 
-
 # Introduction
 
 This study investigates different severity levels of Toronto fire incidents based on financial and casualty losses to support efficient resource allocation for Toronto Fire Service (TFS). The analysis reveals that higher-severity incidents correlate with greater financial losses and more significant human casualties, impacting both civilians and firefighters.
+
 The research identifies specific high-priority response criteria that can improve TFS operations. By examining the data, it has been found that incidents originating from XXX regions, occurring within defined time frames: XXX, and involving XXXX ignition sources exhibit higher risk profiles. This enables TFS to develop strategic response protocols that prioritize these types of incidents. The modeling analysis conducted in this study provides valuable insights into which factors contribute most significantly to incident severity, equipping TFS with the knowledge to enhance response times and allocate resources more effectively.
 
 The insights from this work aim to inform strategic decision-making processes and optimize fire response operations. By understanding and addressing the indicators of high-risk incidents, TFS can better safeguard the community and improve public safety throughout Toronto. This research is an essential step toward developing data-driven approaches that enhance both the efficiency of fire service operations and the overall resilience of the city.
-
-
 
 Estimand paragraph
 
@@ -39,28 +37,85 @@ Why it matters paragraph
 
 Telegraphing paragraph: The remainder of this paper is structured as follows. @sec-data....
 
-
-
-
-
-
 # Data {#sec-data}
 
 ## Overview
 
-We use the statistical programming language R [@citeR].... Our data [@shelter].... Following @tellingstories, we consider...
-
-Overview text
+We use the statistical programming language R [@citeR]to investigate data about fire incidents[@TFSfireedata], downloaded from the Open Data Toronto Portal: https://open.toronto.ca/dataset/fire-incidents/. The dataset was last updated on December 31, 2023. It includes fire incidents following the Ontario Fire Marshal's (OFM) definition, with descriptions according to OFM standards. The dataset also provides detailed information on Toronto Fire Services' (TFS) responses to each fire incident. The data is mostly complete, though some incidents are still under investigation and categorized as "no loss outdoor fire." The dataset includes information on the origin of fires, impacts on civilians and buildings, as well as geographical data. Additionally, it contains details on TFS response times and actions taken. Overall, the dataset is comprehensive, informative, and provides valuable insights for my later study.
 
 ## Measurement
-	
-Some paragraphs about how we go from a phenomena in the world to an entry in the dataset.
 
-## Outcome variables
+The dataset is clearly structured, with the first column as ‘\_id,’ which is a unique identifier for each record in the database. There are 43 columns in total, containing information ranging from Incident Type to Infrastructure. These columns can be mainly divided into four categories based on my understanding:
 
-Add graphs, tables and text. Use sub-sub-headings for each outcome variable or update the subheading to be singular.
+1.  **Incident Type and Cause**: This category contains information directly related to each fire incident, including descriptive details about the incident, its nature, and origin. It covers aspects such as where the fire started, the materials involved, and potential causes. These variables are crucial for predicting fire behavior, and include columns like 'area of origin,' 'level of origin,' and 'smoke spread.'
 
+2.  **Impact on Humans and the Economy**: These variables describe the direct outcomes of fire incidents, including financial and environmental impacts, as well as effects on human life. This category is key for defining the severity of fires. Variables include: firefighter casualties, civilian casualties, building status after the fire, and the number of displaced people.
 
+3.  **Response Evaluation**: This category records TFS's reactions to each reported fire incident. It provides valuable insight into the effectiveness of the current system and helps when predicting fire severity. Variables include: 'fire control time,' 'incident location,' 'number of responding personnel,' and 'TFS arrival times.'
+
+4.  **Safety Infrastructure**: This category includes data related to the status of existing infrastructure during the fire incident. It helps us understand the current system and supports decision-making for future improvements. Variables include: presence of fire alarm systems, sprinkler systems, and their operational status.
+
+This structured approach allows us to analyze and understand various aspects of fire incidents in Toronto. All variables in the dataset have the potential to provide valuable insights and perspectives for various analyses, contributing to fire prevention and safety improvements. However, for my analysis of fire incidents across Toronto, certain variables; such as latitude and longitude, incident numbers in the CAD system, Incident_Ward, and road intersections—are being excluded from the study. A more detailed explanation will be provided in the Appendix.
+
+I have selected 17 variables to begin my exploration of the dataset:
+
+1.  **\_id**: A unique identifier for each record, essential for distinguishing between incidents and for tracking and referencing.
+
+2.  **Area_of_Origin**: Represents the fire’s origin location, useful for analyzing geographical patterns and fire causes.
+
+3.  **Building_Status**: Indicates whether the building was occupied, under construction, or vacant, providing insights into fire severity and response needs.
+
+4.  **Business_Impact**: Classifies the economic impact of the fire on businesses, helping to understand disruptions and guide recovery efforts.
+
+5.  **Civilian_Casualties**: The count of civilian casualties, reflecting the human impact and assessing fire safety and evacuation effectiveness.
+
+6.  **Estimated_Dollar_Loss**: The monetary loss due to fire damage, key for assessing the economic burden and informing prevention efforts.
+
+7.  **Exposures**: The number of secondary fires caused by the primary incident, useful for evaluating the fire's spread and containment success.
+
+8.  **Final_Incident_Type**: The final classification of the fire (e.g., accidental, arson), critical for identifying causes and informing preventive strategies.
+
+9.  **Fire_Alarm_System_Operation**: Indicates whether the fire alarm system functioned properly, evaluating the system’s effectiveness in alerting and activating suppression.
+
+10. **Ignition_Source**: The source of ignition (e.g., electrical faults, arson), crucial for identifying fire causes and guiding safety measures.
+
+11. **Number_of_Responding_Appliances**: The number of fire trucks and equipment dispatched, reflecting the scale of the incident and resource allocation.
+
+12. **Number_of_Responding_Personnel**: The number of fire personnel involved, providing insight into the severity of the fire and the required response intensity.
+
+13. **Possible_Cause**: The potential cause of the fire, useful for identifying trends and informing fire prevention and safety campaigns.
+
+14. **Sprinkler_System_Presence**: Indicates if a sprinkler system was present, highlighting its impact on fire severity and potential casualties.
+
+15. **TFS_Alarm_Time**: The time when the fire service was notified, key for analyzing response time and minimizing damage.
+
+16. **TFS_Arrival_Time**: The time when the first fire service unit arrived, crucial for evaluating response speed and fire control effectiveness.
+
+17. **TFS_Firefighter_Casualties**: The number of firefighter casualties, useful for assessing the safety of firefighting operations and improving risk management.
+
+By focusing on these 17 variables, I aim to uncover meaningful patterns and insights that can support fire safety improvements across the city.
+
+## Data Cleaning
+
+After loading the raw data, I selected the columns of interest as explained in the previous section. These columns were then renamed to lowercase, and spaces were replaced with underscores to ensure consistency. After reviewing the data, I kept in mind that this study focuses on the relationship between ignition sources and fire severity. As a result, I removed rows with "Undetermined" ignition sources.
+
+Since there are time-related variables in the dataset, I converted them to the POSIX format. Additionally, I noticed the presence of several missing (NA) and null values. Given that the dataset contains numerous categorical variables, I considered how to handle missing data differently for these types. I first examined whether any columns contained too little information to provide valuable insights into fire severity or its predictors. After calculating, I decided to remove columns with more than 20% missing data, carefully considering their relevance to the study.
+
+Variables removed:
+
+1.  **Building_Status**: This column provides information on the condition of the building, but it is not directly related to the core objectives of the study, which focus on fire severity, casualties, and financial losses. With more than 20% missing data, it was deemed unnecessary.
+
+2.  **Business_Impact**: While this column tracks the impact of the fire on businesses, it overlaps with the **Estimated_Dollar_Loss** column, which provides more comprehensive financial data. Due to the high missing rate, this column was removed.
+
+3.  **Exposures**: This column captures the number of exposure fires but does not directly contribute to understanding fire severity or its impact on casualties and losses. With more than 20% missing data, it was excluded from the analysis.
+
+Kept variables: The remaining variables are essential for the completeness of the analysis. For categorical data entries, missing values are replaced with “unreported.”
+
+-   **Fire_Alarm_System_Operation**: This variable is crucial because the study aims to understand fire infrastructure.
+
+-   **Sprinkler_System_Presence**: This is also an important variable for understanding fire safety. Given that there are fewer variables under "Safety Infrastructure," it is essential to retain them.
+
+To maintain data quality, rows with more than 30% missing data are removed. After ensuring that there are no missing values in the dataset, a new variable, Response_Time, is created to calculate the time difference (in minutes) between TFS_Alarm_Time and TFS_Arrival_Time. This new variable will help analyze fire response efficiency and is a key indicator for the study.
 
 Some of our data is of penguins (@fig-bills), from @palmerpenguins.
 
@@ -77,10 +132,6 @@ ggplot(penguins, aes(x = island, fill = species)) +
   facet_wrap(~species, ncol = 1) +
   coord_flip()
 ```
-
-Talk more about it.
-
-And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
 
 ```{r}
 #| label: fig-planes
@@ -99,53 +150,155 @@ analysis_data |>
        y = "Wing length (mm)")
 ```
 
-Talk way more about it. 
+## Data Explore
 
-## Predictor variables
+**Understanding Variables of Interest**:\
+To understand the distribution of various categorical and numerical variables in the fire incident dataset, I visualized each variable along with its distribution and reviewed its summary statistics. The goal is to gain insights into the key characteristics of the data, which will support the later stages of analysis and modeling. Below are a few important variables considered:
 
-Add graphs, tables and text.
+1.  **Area of Origin**:\
+    This is a categorical variable that indicates the location within a building or structure where a fire started. Initially, this variable had over 100 categories, so the goal was to categorize these locations into broader groups for easier interpretation and analysis. I grouped the areas into categories such as "Residential and Living Spaces," "Cooking and Dining Areas," and "Storage and Utility Areas," among others. These groups were then visualized to better understand the most common fire origins within the dataset (see Table 1: \[code\]).
 
-Use sub-sub-headings for each outcome variable and feel free to combine a few into one if they go together naturally.
+2.  **Civilian Casualties**:\
+    This is a numerical variable that provides insight into the severity of the incidents. Basic descriptive statistics (e.g., mean, median, and range) were calculated using the `summary()` function. Additionally, a scatter plot was created to explore the relationship between the number of civilian casualties and the incident ID (see \[code\]).
 
+3.  **Final Incident Type**:\
+    This is a categorical variable that classifies the type of incident (e.g., fire, explosion). A bar plot was created to visualize the distribution of different incident types. The frequency of each incident type is also displayed in the table (see \[code\]).
 
+4.  **Ignition Source**:\
+    This variable provides information about the cause of the fire. Categories of ignition sources, such as "Incandescent Lamp" or "Vehicle - Mechanical," were listed. The distribution of ignition sources was visualized with a bar plot (see \[code\]).
 
+**Understanding Potential Indicators of Severity and Their Replashioships**:\
+To explore the relationship between financial losses and casualties, incidents were grouped into financial loss and casualty categories. A heatmap below illustrates the interaction between these two indicators.
 
+.
 
+```{r}
+fire_data <- fire_data %>%
+  mutate(
+    loss_group = cut(
+      estimated_dollar_loss,
+      breaks = c(0, 1000, 10000, 50000, 500000, Inf),
+      labels = c("<1k", "1k-10k", "10k-50k", "50k-500k", ">500k"),
+      right = FALSE
+    ),
+    casualty_group = cut(
+      total_casualties,
+      breaks = c(0, 1, 2, 5, Inf),
+      labels = c("0", "1", "2-5", ">5"),
+      right = FALSE
+    )
+  )
 
+# Summarize data and plot heatmap
+severity_table <- fire_data %>%
+  group_by(loss_group, casualty_group) %>%
+  summarize(count = n(), .groups = "drop")
 
+ggplot(severity_table, aes(x = loss_group, y = casualty_group, fill = count)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  labs(
+    title = "Heatmap of Financial Loss and Casualty Groups",
+    x = "Financial Loss Group",
+    y = "Casualty Group",
+    fill = "Incident Count"
+  ) +
+  theme_minimal()
+
+```
+
+The scatter plot below showcases the relationship between the number of responding apparatus and the logarithmic scale of financial losses. A Pearson correlation coefficient was calculated to assess the strength of this relationship.
+
+```{r}
+fire_data$Log_Dollar_Loss <- log(fire_data$estimated_dollar_loss + 1)
+
+# Scatter plot and correlation
+ggplot(fire_data, aes(x = Log_Dollar_Loss, y = number_of_responding_apparatus)) +
+  geom_point(color = 'blue', alpha = 0.5) +
+  labs(
+    title = 'Number of Responding Apparatus vs Log of Financial Loss',
+    x = 'Log of Financial Loss',
+    y = 'Number of Responding Apparatus'
+  ) +
+  theme_minimal()
+
+# Calculate correlation
+cor(fire_data$Log_Dollar_Loss, fire_data$number_of_responding_apparatus, use = "complete.obs")
+```
 
 # Model
 
-The goal of our modelling strategy is twofold. Firstly,...
+## Define Severity
 
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
+The severity of fire incidents was categorized based on three key factors: the number of responding fire apparatus, the estimated dollar loss, and the total number of casualties. First, the total number of responding apparatus from TFS was calculated and divided into bins after plotting and observing its distribution. Each incident was assigned to a bin based on how many apparatus responded, helping categorize incidents in terms of the scale of response.
 
-## Model set-up
+Next, the estimated dollar loss for each fire incident was log-transformed. This was necessary because the data was extremely right-skewed, with highly influential outliers. The transformation compressed the scale of the data and managed extreme values better. The transformed data was stored in a new variable called `log_estimated_dollar_loss`. Quantiles (25th, 50th, 75th percentiles) were used to divide the dollar loss into categories to make severity thresholds more meaningful.
 
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
+For casualty severity, the number of casualties, including civilians and firefighters, was categorized after observing its distribution. The categories were defined as:
 
-\begin{align} 
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
-\alpha &\sim \mbox{Normal}(0, 2.5) \\
-\beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
-\end{align}
+-   Low: No casualties
 
-We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
+-   Medium: 1 to 3 casualties
 
+-   High: 4 or more casualties
 
-### Model justification
+Another key factor was the incident type. If the type of incident was determined to be an explosion, it was automatically classified as High Severity regardless of other factors. The final severity of fire incidents was determined based on the following logic:
 
-We expect a positive relationship between the size of the wings and time spent aloft. In particular...
+-   If the incident type was an explosion, the severity was **High**.
 
-We can use maths by including latex between dollar signs, for instance $\theta$.
+-   If casualty severity was "Low," apparatus used was in the lower bins (1-10 apparatus), and dollar loss was below the 25th percentile, the severity was **Low**.
 
+-   If casualty severity was "Medium," apparatus was in the mid-range (11-30 apparatus), or dollar loss was below the 50th percentile, the severity was **Medium**.
+
+-   If casualty severity was "High," apparatus response was in the higher bins (31-50 apparatus), or dollar loss was above the 50th percentile, the severity was **High**.
+
+The analysis shows that most incidents fall under the Low Severity category, which aligns with the reality of everyday fire service responses.
+
+```{r}
+
+```
+
+### Set Up Model For Predicting Severities
+
+In this analysis, I aimed to predict the likelihood of high-severity fire incidents using a logistic regression model. The dataset includes several predictor variables that show potential connections to fire incident severities, as identified during prior data visualization. Among these variables, `area_of_origin_grouped` and `ignition_source_grouped` are categorical variables representing the area where the fire started and the source of ignition, respectively. The target variable for the model is the binary classification of fire severity, focusing on predicting high-severity incidents.
+
+To prepare the target variable, the `severity` variable calculated earlier was transformed into a binary variable called `Severity_high`, where incidents classified as "High Severity" were coded as `1`. This binary transformation aligns with the analysis goal of predicting high-severity incidents. Since both predictor variables are categorical, they were converted into factors to ensure compatibility with logistic regression. Additionally, redundant spaces and commas in the variable names were cleaned to standardize the data and improve model interpretability.
+
+To evaluate model performance, the dataset was split into a training set (80%) and a testing set (20%) using the `createDataPartition()` function from the `caret` package in R.
+
+### Model Explnation
+
+A logistic regression model was chosen because the outcome variable, Severity_high, is binary (0/1), and logistic regression is well-suited for binary classification tasks, especially when working with categorical predictor variables. The logistic regression model used the following predictors. The logistic regression model was initially fitted to the training dataset using the formula: ***Severity_high \~ area_of_origin_grouped + ignition_source_grouped.*** This initial model can be expressed as:
+
+$$
+\text{logit}(P) = \ln\left(\frac{P}{1-P}\right) = \beta_0 + \sum_{j=1}^{n_{\text{area}}} \beta_{j,\text{area}} \cdot X_{j,\text{area}} + \sum_{k=1}^{n_{\text{ignition}}} \beta_{k,\text{ignition}} \cdot X_{k,\text{ignition}}
+$$
+
+Where: $P$ is the probability of the event ($P(\text{Severity_high}=1)$). $\text{logit}(P)$ is the log-odds of the probability. $\beta_0$ is the intercept. $\beta_1, \beta_2, \dots, \beta_k$ are the coefficients of the predictor variables $X_1, X_2, \dots, X_k$.
+
+### Model Justification
+
+The initial logistic regression model was evaluated for the significance of the predictors using the p-values from the model summary. Since a high p-value suggests that the variable does not significantly contribute to the model in prediction, it was removed to simplify the model and improve interpretability. This decision follows the principle outlined by Occam's Razor \[\@blumer1987occam\], which proposes that people prefer simplicity.
+
+To check for multicollinearity among the predictors, the Variance Inflation Factor (VIF) was calculated. According to standard practice, if any predictors had a high VIF (greater than 5), they were considered for removal to avoid multicollinearity, which could distort the model's estimates.
+
+Based on the results, the variable *ignition_source_grouped* was removed from the model due to its non-significance (high p-value). The updated model retained only *area_of_origin_grouped*, which showed a significant relationship with the likelihood of high-severity fires. Model is:
+
+$$
+\text{logit}(P) = \ln\left(\frac{P}{1-P}\right) = \beta_0 + \sum_{j=1}^{n_{\text{area}}} \beta_{j,\text{area}} \cdot X_{j,\text{area}}
+$$
+
+The model's performance was also assessed using the Akaike Information Criterion (AIC), a measure of the model's goodness of fit. A lower AIC indicates a better-fitting model, and removing the insignificant variable *ignition_source_grouped* improved the AIC, providing more evidence that the updated, simpler model was a better fit for the data.
+
+### **Model Evaluation**
+
+The updated logistic regression model was evaluated using the receiver operating characteristic (ROC) curve, with predictions made on the test dataset. The curve was plotted to assess the model’s ability to discriminate between high and low-severity fire incidents. The area under the curve (AUC) is a key metric for model performance; higher AUC values indicate better model performance \[\@metz1978basic\]. The simpler model, after removing insignificant predictors, combined with its performance on the test set, provides a better understanding of the relationship between fire characteristics and severity.
 
 # Results
 
-Our results are summarized in @tbl-modelresults.
+### **Logistic Regression Model Results**
+
+The logistic regression model was fitted to predict the probability of high severity fire incidents based on the categorical variables **area of origin**. The final model retained only significant predictors based on p-values and collinearity diagnostics. Below are the key findings:
 
 ```{r}
 #| echo: false
@@ -175,14 +328,11 @@ modelsummary::modelsummary(
 )
 ```
 
-
-
-
 # Discussion
 
 ## First discussion point {#sec-first-point}
 
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
+If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this.
 
 ## Second discussion point
 
@@ -198,8 +348,7 @@ Weaknesses and next steps should also be included.
 
 \appendix
 
-# Appendix {-}
-
+# Appendix {.unnumbered}
 
 # Additional data details
 
@@ -209,7 +358,7 @@ Weaknesses and next steps should also be included.
 
 In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. This shows...
 
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows... 
+In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows...
 
 ```{r}
 #| eval: true
@@ -253,11 +402,6 @@ plot(first_model, "trace")
 plot(first_model, "rhat")
 ```
 
-
-
 \newpage
 
-
 # References
-
-
