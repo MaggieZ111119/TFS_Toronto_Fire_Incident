@@ -2,7 +2,7 @@
 
 ## Overview
 
-This Repo contain study investigates fire severity levels in Toronto to improve resource allocation for Toronto Fire Services (TFS). The analysis identifies that higher-severity incidents are strongly correlated with incidents originating from mechanical, HVAC,
+This repository contains the Toronto Fire Services (TFS) Incidents Analysis project. The project investigates fire severity levels in Toronto to improve resource allocation for Toronto Fire Services (TFS). The analysis identifies that higher-severity incidents are correlated with incidents originating from mechanical, HVAC,
 and electrical areas, while cooking and lighting areas tend to lead to lower severity
 fires. The study also finds that fire incidents involving certain ignition sources,
 such as electrical units or lightning equipment, are more likely to be severe. Additionally, severe fires are associated with greater financial losses and higher casualty
@@ -24,7 +24,7 @@ The repo is structured as:
 
 ## Statement on LLM usage
 
-Aspects of the paper are written with the help of ChatGPT4.0 and the full chat history is available in `other/llms/usage.txt`.
+Aspects of the paper are written with the help of ChatGPT 4.0 and the full chat history is available in `other/llms/usage.txt`.
 
 
 
