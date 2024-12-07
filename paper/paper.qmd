@@ -23,8 +23,10 @@ library(ggplot2)
 library(tidyr)
 library(lubridate)
 library(knitr)
+library(arrow)
 
-fire_data <- read.csv(file = here::here("data/02-analysis_data/tfs_analysis_data"))
+
+fire_data <- read_parquet(file = here::here("data/02-analysis_data/tfs_analysis_data.parquet"))
 
 
 ```
@@ -133,8 +135,9 @@ I have selected 17 variables to begin my exploration of the dataset:
 By focusing on these 17 variables, I aim to uncover meaningful patterns and insights that can support fire safety improvements across the city.
 
 ## Data Cleaning
+The raw dataset was stored in its original csv format to ensure data integrity and reproducibility, and later analysis data after cleaning and processing is saved into parquet file using `write_parquet` function in `arrow` package [@arrow2024].
 
-After loading the raw data, I selected the columns of interest as explained in the previous section. These columns were then renamed to lowercase, and spaces were replaced with underscores to ensure consistency. After reviewing the data, I kept in mind that this study focuses on the relationship between ignition sources and fire severity. As a result, I removed rows with "Undetermined" ignition sources.
+After loading the original raw data, I selected the columns of interest as explained in the previous section. These columns were then renamed to lowercase, and spaces were replaced with underscores to ensure consistency. After reviewing the data, I kept in mind that this study focuses on the relationship between ignition sources and fire severity. As a result, I removed rows with "Undetermined" ignition sources.
 
 Since there are time-related variables in the dataset, I converted them to the POSIX format. Additionally, I noticed the presence of several missing (NA) and null values. Given that the dataset contains numerous categorical variables, I considered how to handle missing data differently for these types. I first examined whether any columns contained too little information to provide valuable insights into fire severity or its predictors. After calculating, I decided to remove columns with more than 20% missing data, carefully considering their relevance to the study.
 
@@ -160,7 +163,8 @@ To maintain data quality, rows with more than 30% missing data are removed. Afte
 #| echo: false
 #| warning: false
 library(ggplot2)
-fire_data <- read.csv(here::here("data/02-analysis_data/tfs_analysis_data"))
+library(arrow)
+fire_data <- read_parquet(here::here("data/02-analysis_data/tfs_analysis_data.parquet"))
 ## 15. Response Time (Numerical) ##
 #Plot
 ggplot(fire_data, aes(x = response_time)) +
@@ -169,7 +173,7 @@ ggplot(fire_data, aes(x = response_time)) +
   ggtitle("Response Time Distribution") +
   xlab("Response Time (minutes)") +
   ylab("Frequency") +
-  stat_bin(aes(label = ..count..), geom = "text", vjust = 0.5, size = 3) +
+  stat_bin(aes(label = ..count..), geom = "text", vjust = -0.5, size = 3) +
   xlim(0, 15) 
 
 ```
@@ -323,7 +327,7 @@ ggplot(fire_data, aes(x = area_of_origin_grouped)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   xlab("Area of Origin") +
   ylab("Frequency") +
-  geom_text(stat = "count", aes(label = ..count..), vjust = 0.5)
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5)
 
 
 ```
@@ -363,7 +367,7 @@ ggplot(fire_data, aes(x = final_incident_type)) +
   scale_x_discrete(labels = function(x) sapply(x, function(y) paste(head(strsplit(y, " ")[[1]], 3), collapse = " "))) +
   xlab("Final Incident Type") +
   ylab("Frequency") +
-  geom_text(stat = "count", aes(label = ..count..), vjust = 0.5)
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5)
 
 ```
 
@@ -492,7 +496,7 @@ ggplot(fire_data, aes(x = ignition_source_grouped)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
   xlab("Ignition Source Group") +
   ylab("Frequency") +
-  geom_text(stat = "count", aes(label = ..count..), vjust = 0.5)
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5)
 
 ```
 
@@ -576,7 +580,7 @@ Next, the estimated dollar loss for each fire incident was log-transformed. This
 #| warning: false
 #| message: false
 
-fire_data_model <- read_csv( file = here::here("data/02-analysis_data/severity_tfs_analysis_data"))
+fire_data_model <- read_parquet( file = here::here("data/02-analysis_data/severity_tfs_analysis_data.parquet"))
 
 ```
 
@@ -616,7 +620,7 @@ library(fitdistrplus)
 library(knitr)
 
 #### Read data ####
-fire_data_model <- read_csv(file = here::here("data/02-analysis_data/updated_tfs_analysis_data"))
+fire_data_model <- read_parquet(file = here::here("data/02-analysis_data/updated_tfs_analysis_data.parquet"))
 
 #### Quantify Severity ####
 
@@ -739,7 +743,7 @@ library(xgboost)
 library(kableExtra)
 
 
-fire_data_model <- read_csv(file = here::here("data/02-analysis_data/severity_tfs_analysis_data"))
+fire_data_model <- read_parquet(file = here::here("data/02-analysis_data/severity_tfs_analysis_data.parquet"))
 
 
 #### Prepare Data ####
@@ -838,7 +842,7 @@ Therefore, `area_of_origin` is indeed a significant predictor of fire severity, 
 
 There is no doubt that infrastructure such as fire alarm and sprinkler systems play a crucial role in controlling fire severity. The presence of these systems will reduces the risk and impact of fires. However, the key question remains: how well do these fire safety infrastructures perform in real fire incidents? We come across result of question by looking at the result we get from analyzing the data set. In this analysis, I processed the data and visualized the distribution of fire alarm system operations and sprinkler system presence across different levels of fire severity (Low, Medium, High). These visualizations provide valuable insights into how the presence of these systems correlates with the severity of fire incidents.
 
-## Fire Alarm System Status
+### Fire Alarm System Status
 
 The results shown from the exploration of the proportion of fire alarm system statuses by severity (@fig-firealarmsystem-proportion) reveal that the fire alarm system was successfully operated during many low to medium severity fire incidents. However, it did not perform as reliably in high severity cases. It is important to note that the y-axis represents the proportion, and considering that high-severity incidents are much less frequent, their proportion might not be as large in comparison to the number of incidents. Nevertheless, this comparison provides useful insights, as we never want the system to fail when a real, highly severe incident occurs. This allows for a clearer understanding of how alarm system functionality varies. It is evident that our fire alarm system needs improvement in its operation during actual fire events.
 
@@ -857,7 +861,7 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 
-fire_data_current <- read_csv( file = here::here("data/02-analysis_data/severity_tfs_analysis_data"))
+fire_data_current <- read_parquet( file = here::here("data/02-analysis_data/severity_tfs_analysis_data.parquet"))
 
 #### fire_alarm_system_operation ####
 
@@ -892,6 +896,8 @@ ggplot(fire_operation_data_filtered, aes(x = Severity, fill = fire_alarm_system_
     strip.text = element_text(size = 12)
   )  
 ```
+
+### Sprinkler System Status
 
 As shown in (@fig-sprinklersystem), I have plotted the presence of the sprinkler system across different levels of fire severity. The operational status of the sprinkler system is represented by various colors corresponding to statuses such as "Full sprinkler system present," "Partial sprinkler system present,". The results reveal that in High severity incidents, the "Undetermined" status is more common, indicating there may be a lack of clarity or understanding regarding the sprinkler system's functionality. In Low severity incidents, the sprinkler system is most frequently reported as absent ("No sprinkler system"). In fact, this absence is the dominant status across all three levels of severity. This suggests that improvements in sprinkler system availability and implementation should be a focus for the future, particularly in higher severity fire scenarios, where the system's functionality could play a critical role in preventing further negative impact.
 
@@ -955,11 +961,37 @@ From the ROC curve, we can tell that it minimizes false negatives more in focus.
 
 In fact, the cost of missing high-severity fires is far greater than the cost of false positives. While false positives may lead to overreaction, failing to detect a severe fire could escalate into a major disaster, resulting in significant financial losses and potentially causing more casualties. Therefore, a model that is tuned to minimize false negatives is preferable, as it prioritizes catching severe fires—even at the expense of some false positives. However, I will continue to fit additional models to strike a better balance between specificity and sensitivity.
 
-## Government and Agency Actions for Improving Fire Safety Infrastructure {#sec-second-point}
+## Limitations and Biases in the Data {#sec-second-point}
+### Potential Bias
+
+The fire incidence dataset includes several categorical variables such as Ignition Source, Possible Cause, and Initial Types. During data collection, these variables, which have a limited range of categories, may introduce various types of bias.
+
+1.  **Classification Bias**: Classification bias occurs when events are mis-classified into categories that do not accurately represent the event itself [@brogden1950theory]. This leads to incorrect or misleading conclusions. For example, in the dataset, there is a variable called Possible_Cause, which has over 100 categories, including categories like "Undetermined" and "Suspected Vandalism." When categorizing causes into these categories, ambiguity arises. There may not be enough evidence to definitively classify a cause, and this uncertainty can result in bias. If we were to generalize these 100 causes into fewer categories for prediction purposes, one of the generalized categories could be biased, misrepresenting the actual distribution of causes. This is one of the reasons why I decided to remove this variable from the dataset, besides the fact that it contains many missing values (NAs).
+2.  **Selective Reporting Bias**: Reporting bias occurs when data does not accurately reflect reality due to incomplete reporting [@saini2014selective]. In our case, this is particularly relevant for civilian and firefighter casualties related to different fire incidents. It's possible that some fire incidents are not reported, especially smaller ones that don't require significant resources. On the other hand, large, tragic fire incidents are often over-reported or emphasized more than necessary. As a result, the reported number of casualties may be skewed. These discrepancies in the data can affect the definition of what is considered a "severe" fire. If we use these skewed measurements to make predictions or draw conclusions, the resulting insights may be biased.
+
+Due to these biases, the quality of the data depends heavily on how the original data collectors set up their categorization systems. It's crucial to ensure that these systems are designed to capture sufficient and accurate data. By acknowledging the existence of classification and reporting biases, we can avoid overly relying on conclusions and predictions that may be skewed by these factors. Fire incidents, by nature, have risks that should be carefully accounted for in the data collection process to ensure more reliable results.
+
+### Sampling Method in the Data
+
+The fire incident dataset comes from the Ontario Fire Marshal (OFM) and includes incidents to which the Toronto Fire Service (TFS) responded. This data collection is not random, as it is not based on surveys or experimental studies. Instead, it is observational data collected by a specific organization. This can be considered **event-based sampling**.
+
+Event-based sampling is a technique where data is collected when certain events occur, meeting predefined criteria [@sanchez2009application]. This is different from systematically collecting data over a fixed time frame. In this case, data are recorded for every fire incident recognized by the OFM, with each fire incident treated as an event. Event-related data, such as the reason for the fire, time of occurrence, and the TFS's response actions, are recorded.
+
+This is a **non-random sampling method**, meaning that events are not randomly selected from the entire population[@brislin1971non]. Here, the data is gathered based on the occurrence of specific events. As a result, the data may be skewed by the types of incidents that happen to be recorded. For example, areas with higher risks of fires, such as electrical factories according to our modelling, are more likely to be included in the dataset due to the higher frequency of fire incidents in these locations. Therefore, while the dataset provides valuable insights, it is important to acknowledge that the data are not randomly selected, which could introduce bias in the conclusions or predictions drawn from the dataset.
+
+### Privacy Protection in the Data
+
+The fire incident dataset contains real, sensitive data collected from residents in Toronto. Therefore, it is essential to understand how the data is protected to ensure confidentiality.
+
+1.  **Excluded Data:** As mentioned on the data portal, some data have been excluded from the dataset to protect the privacy of individuals. This might explain why there are fewer high-severity cases in the dataset. For more severe incidents, it is more likely that the information could be recognized by the public, as media coverage and news publications often spread the details. As a result, these incidents may be easier to trace back to specific individuals or locations. To protect privacy, such data have been removed. However, this exclusion creates a natural incompleteness in the dataset, as these important and representative data cases, especially important to predict high severity, are no longer available for analysis.
+
+2.  **Aggregated Geographical Data**: Even though the study does not directly analyze fire incidents by district, geographical information remains important. To further protect privacy, the data collectors have aggregated exact locations into broader regions, such as large intersections or general areas. While this approach preserves privacy, it may introduce challenges for spatial analysis. Spatial analysis heavily relies on precise location data, so the aggregation of location information can limit the ability to perform detailed spatial studies and may affect the accuracy of geographical insights.
+
+## Government and Agency Actions for Improving Fire Safety Infrastructure {#sec-third-point}
 
 As the results from our analysis show, there is a significant need for improvement in both the facilitation and implementation of current fire safety systems. The fire alarm system, for example, demonstrated a good operational response in lower and medium severity incidents but failed to function effectively during high-severity situations. Similarly, sprinkler systems showed varying levels of performance, with a higher proportion of "Undetermined" and "Not applicable" statuses in high-severity incidents. These findings raise concerns, as high-severity fires, although less frequent, have a disproportionately severe impact. It is crucial for relevant agencies to ensure that these systems operate reliably during fire incidents, particularly in high-severity cases. Priority should be given to maintaining fire alarm systems and improving the implementation of sprinkler systems. These measures will be essential for mitigating the risks and impacts of severe fire incidents.
 
-## TFS Decision Making {#sec-third-point}
+## TFS Decision Making {#sec-fourth-point}
 
 The TFS (fire services) should prioritize decision-making before heading to the fire scene based on the predictor variables identified in the study, ensuring they reach the scene as quickly as possible without missing any high-severity incidents. It's also crucial to ensure the right amount of resources, such as firefighters, are allocated. By focusing on key variables like the area of origin, TFS can allocate resources more effectively.
 
@@ -975,7 +1007,7 @@ Thus, when TFS get reported of a fire, if there is a possibility that the fire o
 #| label: fig-areaoforigin
 #| fig-caption: This plot shows the proportional distribution of top 5 different areas of origin across various fire severity levels (Low, Medium, High). The stacked bar plot illustrates the relative frequency of areas of origin, with the y-axis representing proportions. Mechanical, HVAC, and electrical areas are more common in high-severity incidents, suggesting these are higher-risk areas in terms of fire severity.
 
-fire_data_model <- read_csv(here::here("data/02-analysis_data/severity_tfs_analysis_data"))
+fire_data_model <- read_parquet(here::here("data/02-analysis_data/severity_tfs_analysis_data.parquet"))
 
 #Convert Severity and area_of_origin_grouped to factors
 fire_data_model <- fire_data_model %>%
@@ -1063,11 +1095,14 @@ ggplot(fire_data_filtered, aes(x = ignition_source_grouped, fill = ignition_sour
 
 ```
 
+
 \newpage
 
 \appendix
 
-# Appendix A {#sec-appendixa}
+# Appendix {-}
+
+# Data and Variable Selection
 
 ```{r}
 #| include: false
@@ -1081,7 +1116,7 @@ library(lubridate)
 library(knitr)
 
 #### Read data ####
-fire_data <- read.csv(here::here("data/02-analysis_data/tfs_analysis_data"))
+fire_data <- read_parquet(here::here("data/02-analysis_data/tfs_analysis_data.parquet"))
 #### Data Overview ####
 # Structure
 head(fire_data)
@@ -1093,7 +1128,7 @@ print(missing_data)
 
 ```
 
-This appendix contains all plot/summary distribution of all variables in intrested choose in analysis data set.
+This appendix contains all plot/summary distribution of all variables in interested choose in analysis data set.
 
 1.  Are of Origin (see @fig-area-origin-distribution)
 2.  Civilian Casualties (see @tbl-civilian-casualties-summary)
@@ -1319,34 +1354,8 @@ ggplot(casualties_df, aes(x = "", y = Freq, fill = factor(Var1))) +
 
 15. Response Time (See @fig-response-time-distribution)
 
-# Appendix B {#sec-appendix-B}
 
-## Method Behind Data
 
-### Potential Bias
-
-The fire incidence dataset includes several categorical variables such as Ignition Source, Possible Cause, and Initial Types. During data collection, these variables, which have a wide range of categories, may introduce various types of bias.
-
-1.  **Classification Bias**: Classification bias occurs when events are mis-classified into categories that do not accurately represent the event itself [@brogden1950theory]. This leads to incorrect or misleading conclusions. For example, in the dataset, there is a variable called Possible_Cause, which has over 100 categories, including categories like "Undetermined" and "Suspected Vandalism." When categorizing causes into these categories, ambiguity arises. There may not be enough evidence to definitively classify a cause, and this uncertainty can result in bias. If we were to generalize these 100 causes into fewer categories for prediction purposes, one of the generalized categories could be biased, misrepresenting the actual distribution of causes. This is one of the reasons why I decided to remove this variable from the dataset, besides the fact that it contains many missing values (NAs).
-2.  **Selective Reporting Bias**: Reporting bias occurs when data does not accurately reflect reality due to incomplete reporting [@saini2014selective]. In our case, this is particularly relevant for civilian and firefighter casualties related to different fire incidents. It's possible that some fire incidents are not reported, especially smaller ones that don't require significant resources. On the other hand, large, tragic fire incidents are often over-reported or emphasized more than necessary. As a result, the reported number of casualties may be skewed. These discrepancies in the data can affect the definition of what is considered a "severe" fire. If we use these skewed measurements to make predictions or draw conclusions, the resulting insights may be biased.
-
-Due to these biases, the quality of the data depends heavily on how the original data collectors set up their categorization systems. It's crucial to ensure that these systems are designed to capture sufficient and accurate data. By acknowledging the existence of classification and reporting biases, we can avoid overly relying on conclusions and predictions that may be skewed by these factors. Fire incidents, by nature, have risks that should be carefully accounted for in the data collection process to ensure more reliable results.
-
-### **Privacy Protect**
-
-The fire incident dataset contains real, sensitive data collected from residents in Toronto. Therefore, it is essential to understand how the data is protected to ensure confidentiality.
-
-1.  **Excluded Data:** As mentioned on the data portal, some data have been excluded from the dataset to protect the privacy of individuals. This might explain why there are fewer high-severity cases in the dataset. For more severe incidents, it is more likely that the information could be recognized by the public, as media coverage and news publications often spread the details. As a result, these incidents may be easier to trace back to specific individuals or locations. To protect privacy, such data have been removed. However, this exclusion creates a natural incompleteness in the dataset, as these important and representative data cases, especially important to predict high severity, are no longer available for analysis.
-
-2.  **Aggregated Geographical Data**: Even though the study does not directly analyze fire incidents by district, geographical information remains important. To further protect privacy, the data collectors have aggregated exact locations into broader regions, such as large intersections or general areas. While this approach preserves privacy, it may introduce challenges for spatial analysis. Spatial analysis heavily relies on precise location data, so the aggregation of location information can limit the ability to perform detailed spatial studies and may affect the accuracy of geographical insights.
-
-### Sampling Method in Fire Incident Data
-
-The fire incident dataset comes from the Ontario Fire Marshal (OFM) and includes incidents to which the Toronto Fire Service (TFS) responded. This data collection is not random, as it is not based on surveys or experimental studies. Instead, it is observational data collected by a specific organization. This can be considered **event-based sampling**.
-
-Event-based sampling is a technique where data is collected when certain events occur, meeting predefined criteria [@sanchez2009application]. This is different from systematically collecting data over a fixed time frame. In this case, data are recorded for every fire incident recognized by the OFM, with each fire incident treated as an event. Event-related data, such as the reason for the fire, time of occurrence, and the TFS's response actions, are recorded.
-
-This is a **non-random sampling method**, meaning that events are not randomly selected from the entire population[@brislin1971non]. Here, the data is gathered based on the occurrence of specific events. As a result, the data may be skewed by the types of incidents that happen to be recorded. For example, areas with higher risks of fires, such as electrical factories according to our modelling, are more likely to be included in the dataset due to the higher frequency of fire incidents in these locations. Therefore, while the dataset provides valuable insights, it is important to acknowledge that the data are not randomly selected, which could introduce bias in the conclusions or predictions drawn from the dataset.
 
 \newpage
 
