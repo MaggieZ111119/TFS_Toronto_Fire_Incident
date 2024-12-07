@@ -391,8 +391,8 @@ summary(fire_data$number_of_responding_personnel)
 
 ## 9. Possible Cause ##
 #plot all that hsa frequency greater than 550
-filtered_data <- fire_data %>%
-  count(possible_cause) %>%
+filtered_data <- fire_data |>
+  count(possible_cause) |>
   filter(n > 550)
 ggplot(filtered_data, aes(x = possible_cause, y = n)) +
   geom_bar(stat = "identity", fill = "blue") +
@@ -404,7 +404,7 @@ ggplot(filtered_data, aes(x = possible_cause, y = n)) +
   geom_text(aes(label = n), vjust = -0.5)
 #Full Tabble
 cause_table <- table(fire_data$possible_cause)
-cause_table_df <- as.data.frame(cause_table) %>%
+cause_table_df <- as.data.frame(cause_table) |>
   arrange(desc(Freq))
 kable(cause_table_df, col.names = c("Possible Cause", "Frequency"), 
              caption = "Frequency of Possible Causes (Descending Order)", 
@@ -439,12 +439,12 @@ ggplot(fire_data, aes(x = year)) +
 theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # from year plot, we can see that 2022 and 2023 does not provide much information so we can droped them.
-fire_data_filtered <- fire_data %>%
+fire_data_filtered <- fire_data |>
   filter(!is.na(year) & !is.na(month) & month >= 1 & month <= 12)
-incident_count_by_year_month <- fire_data_filtered %>%
-  group_by(year, month) %>%
+incident_count_by_year_month <- fire_data_filtered |>
+  group_by(year, month) |>
   summarize(count = n(), .groups = 'drop')
-incident_count_by_year_month_ex <- incident_count_by_year_month %>%
+incident_count_by_year_month_ex <- incident_count_by_year_month |>
   filter(!(year %in% c(2022, 2023)))
 incident_count_by_year_month_ex$month <- factor(incident_count_by_year_month_ex$month, levels = 1:12)
 ggplot(incident_count_by_year_month_ex, aes(x = month, y = count)) +
@@ -467,7 +467,7 @@ ggplot(incident_count_by_year_month_ex, aes(x = month, y = count)) +
   )
 
 # Table
-incident_table <- incident_count_by_year_month %>%
+incident_table <- incident_count_by_year_month |>
   pivot_wider(names_from = month, values_from = count, values_fill = 0)
 
 # Print the table
@@ -537,7 +537,7 @@ ggplot(fire_data, aes(x = high_severity, fill = high_severity)) +
 fire_data$total_casualties <- fire_data$civilian_casualties + fire_data$tfs_firefighter_casualties
 
 #heatmap
-fire_data <- fire_data %>%
+fire_data <- fire_data |>
   mutate(
     loss_group = cut(
       estimated_dollar_loss,
@@ -553,8 +553,8 @@ fire_data <- fire_data %>%
     )
   )
 
-severity_table <- fire_data %>%
-  group_by(loss_group, casualty_group) %>%
+severity_table <- fire_data |>
+  group_by(loss_group, casualty_group) |>
   summarize(count = n())
 
 ggplot(severity_table, aes(x = loss_group, y = casualty_group, fill = count)) +
@@ -582,14 +582,14 @@ ggplot(fire_data, aes(x = as.factor(total_casualties), y = estimated_dollar_loss
 
 ##Area of Origin vs. Financial Loss ##
 # Summarize data by area_of_origin_grouped
-severity_by_area <- fire_data %>%
-  group_by(area_of_origin_grouped) %>%
+severity_by_area <- fire_data |>
+  group_by(area_of_origin_grouped) |>
   summarize(
     avg_loss = mean(estimated_dollar_loss, na.rm = TRUE),
   )
 
 # Reshape for plotting
-severity_long_are <- severity_by_area %>%
+severity_long_are <- severity_by_area |>
   tidyr::pivot_longer(cols = c(avg_loss), names_to = "metric", values_to = "value")
 
 # Bar chart
@@ -607,13 +607,13 @@ ggplot(severity_long_are, aes(x = reorder(area_of_origin_grouped, value), y = va
 
 
 ##Ignition Source vs. Financial Loss ##
-severity_by_source <- fire_data %>%
-  group_by(ignition_source_grouped) %>%
+severity_by_source <- fire_data |>
+  group_by(ignition_source_grouped) |>
   summarize(
     avg_loss = mean(estimated_dollar_loss, na.rm = TRUE),
   )
 # Reshape for plotting
-severity_long_source <- severity_by_area %>%
+severity_long_source <- severity_by_area |>
   tidyr::pivot_longer(cols = c(avg_loss), names_to = "metric", values_to = "value")
 # Bar chart
 ggplot(severity_long_source, aes(x = reorder(area_of_origin_grouped, value), y = value, fill = metric)) +
@@ -631,8 +631,8 @@ ggplot(severity_long_source, aes(x = reorder(area_of_origin_grouped, value), y =
 
 #### Correlations ####
 # Boxplot for response time by area of origin
-response_summary <- fire_data %>%
-  group_by(area_of_origin_grouped) %>%
+response_summary <- fire_data |>
+  group_by(area_of_origin_grouped) |>
   summarize(avg_response_time = mean(response_time, na.rm = TRUE))
 # Bar plot
 ggplot(response_summary, aes(x = area_of_origin_grouped, y = avg_response_time)) +
@@ -642,9 +642,9 @@ ggplot(response_summary, aes(x = area_of_origin_grouped, y = avg_response_time))
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ##Line plot for average response time over months##
-fire_data %>%
-  group_by(month) %>%
-  summarize(avg_response_time = mean(response_time, na.rm = TRUE)) %>%
+fire_data |>
+  group_by(month) |>
+  summarize(avg_response_time = mean(response_time, na.rm = TRUE)) |>
   ggplot(aes(x = month, y = avg_response_time)) +
   geom_line(color = "blue", size = 1) +
   geom_point(color = "red", size = 2) +
@@ -680,7 +680,7 @@ lower_bound <- Q1 - 1.5 * IQR_value
 upper_bound <- Q3 + 1.5 * IQR_value
 
 # Filter out outliers
-fire_data_clean <- fire_data %>%
+fire_data_clean <- fire_data |>
   filter(response_time >= lower_bound & response_time <= upper_bound)
 
 # Histogram after removing outliers
@@ -704,7 +704,7 @@ lower_bound_loss <- Q1_loss - 1.5 * IQR_loss
 upper_bound_loss <- Q3_loss + 1.5 * IQR_loss
 
 # Filter out outliers for estimated dollar loss
-fire_data_clean_loss <- fire_data_clean %>%
+fire_data_clean_loss <- fire_data_clean |>
   filter(estimated_dollar_loss >= lower_bound_loss & estimated_dollar_loss <= upper_bound_loss)
 
 # Histogram after removing outliers for estimated dollar loss

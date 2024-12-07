@@ -24,14 +24,14 @@ fire_data_model <- read_parquet("data/02-analysis_data/updated_tfs_analysis_data
 #### Quantify Severity ####
 
 ### Apparatus
-fire_data_model <- fire_data_model %>%
+fire_data_model <- fire_data_model |>
   mutate(severity_bin = cut(number_of_responding_apparatus,
                             breaks = c(0, 10, 20, 30, 40, 50, Inf),
                             labels = c("[1,10]", "[11,20]", "[21,30]", "[31,40]", "[41,50]", ">50"),
                             right = TRUE))
-severity_dist <- fire_data_model %>%
-  group_by(severity_bin) %>%
-  summarise(frequency = n()) %>%
+severity_dist <- fire_data_model |>
+  group_by(severity_bin) |>
+  summarise(frequency = n()) |>
   ungroup()
 #severity_dist
 
@@ -46,7 +46,7 @@ loss_quantiles <- quantile(fire_data_model$log_estimated_dollar_loss, probs = c(
 table(fire_data_model$total_casualties)
 
 ### Determining Severity
-fire_data_model <- fire_data_model %>%
+fire_data_model <- fire_data_model |>
   mutate(
     # Define Casualty Severity
     casualty_severity = case_when(
@@ -90,22 +90,22 @@ fire_data_model <- read_parquet("data/02-analysis_data/severity_tfs_analysis_dat
 
 ## Factor of Ignition Source ##
 # Convert Severity and ignition_source_grouped to factors
-fire_data_model <- fire_data_model %>%
+fire_data_model <- fire_data_model |>
   mutate(
     Severity = factor(Severity, levels = c("Low", "Medium", "High")),
     ignition_source_grouped = factor(ignition_source_grouped)  # Convert ignition_source_grouped to factor
   )
 
 # Calculate the top 5 ignition sources for each Severity group
-top_ignition_sources <- fire_data_model %>%
-  group_by(Severity, ignition_source_grouped) %>%
-  tally() %>%
-  group_by(Severity) %>%
-  top_n(5, n) %>%
+top_ignition_sources <- fire_data_model |>
+  group_by(Severity, ignition_source_grouped) |>
+  tally() |>
+  group_by(Severity) |>
+  top_n(5, n) |>
   ungroup()
 
 # Filter the dataset to include only the top ignition sources for each severity
-fire_data_filtered <- fire_data_model %>%
+fire_data_filtered <- fire_data_model |>
   semi_join(top_ignition_sources, by = c("Severity", "ignition_source_grouped"))
 
 # Create a stacked bar plot with percentages
@@ -144,22 +144,22 @@ ggplot(fire_data_filtered, aes(x = ignition_source_grouped, fill = ignition_sour
 
 ## Factor: Area of Origin ##
 # Convert Severity and area_of_origin_grouped to factors
-fire_data_model <- fire_data_model %>%
+fire_data_model <- fire_data_model |>
   mutate(
     Severity = factor(Severity, levels = c("Low", "Medium", "High")),
     area_of_origin_grouped = factor(area_of_origin_grouped)  # Convert area_of_origin_grouped to factor
   )
 
 # Calculate the top 5 Area of Origins for each Severity group
-top_area_of_origin <- fire_data_model %>%
-  group_by(Severity, area_of_origin_grouped) %>%
-  tally() %>%
-  group_by(Severity) %>%
-  top_n(5, n) %>%
+top_area_of_origin <- fire_data_model |>
+  group_by(Severity, area_of_origin_grouped) |>
+  tally() |>
+  group_by(Severity) |>
+  top_n(5, n) |>
   ungroup()
 
 # Filter the dataset to include only the top Area of Origins for each severity
-area_data_filtered <- fire_data_model %>%
+area_data_filtered <- fire_data_model |>
   semi_join(top_area_of_origin, by = c("Severity", "area_of_origin_grouped"))
 
 # Create a stacked bar plot with percentages

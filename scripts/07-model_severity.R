@@ -20,7 +20,7 @@ fire_data_model <- read_parquet("data/02-analysis_data/severity_tfs_analysis_dat
 
 #### Prepare Data ####
 
-fire_data_model <- fire_data_model %>%
+fire_data_model <- fire_data_model |>
   mutate(Severity_high = as.factor(ifelse(Severity == "High", 1, 0)))
 
 fire_data_model <- fire_data_model[, c(

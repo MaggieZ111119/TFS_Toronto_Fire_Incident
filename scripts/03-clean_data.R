@@ -35,7 +35,7 @@ head(clean_data, 6)
 summary(clean_data)   
 
 # Since I want to study possible sources leading to different severity of fire, no info about sources should be dropped
-clean_data <- clean_data %>%
+clean_data <- clean_data |>
   filter(ignition_source != "999 - Undetermined")
 
 ### Ensure Datetime Consistency ###
