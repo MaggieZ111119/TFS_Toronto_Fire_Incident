@@ -14,10 +14,11 @@ library(ggplot2)
 library(tidyr)
 library(lubridate)
 library(knitr)
+library(arrow)
 
 
 #### Read data ####
-fire_data <- read.csv("data/02-analysis_data/tfs_analysis_data")
+fire_data <- read_parquet("data/02-analysis_data/tfs_analysis_data.parquet")
 
 #### Data Overview ####
 # Structure
@@ -179,7 +180,7 @@ civilian_casualties_df
 # Summary table
 summary(fire_data$civilian_casualties)
 #Plot
-ggplot(fire_data, aes(x = X_id, y = civilian_casualties)) +
+ggplot(fire_data, aes(x = `_id`, y = civilian_casualties)) +
   geom_point(color = "darkgreen", size = 2, shape = 16) +
   theme_minimal() +
   ggtitle("Scatterplot of Number of Responding Personnel vs. Incident ID") +
@@ -357,7 +358,7 @@ ggplot(fire_data, aes(x = number_of_responding_apparatus)) +
   ylab("Frequency") +
   stat_bin(aes(label = ..count..), geom = "text", vjust = -0.5, size = 3)
 #ScatterPlot
-ggplot(fire_data, aes(x = X_id, y = number_of_responding_apparatus)) +
+ggplot(fire_data, aes(x = `_id`, y = number_of_responding_apparatus)) +
   geom_point(color = "darkorange", size = 2, shape = 16) +
   theme_minimal() +
   ggtitle("Scatterplot of Number of Responding apparatus vs. Incident ID") +
@@ -378,7 +379,7 @@ ggplot(fire_data, aes(x = number_of_responding_personnel)) +
   ylab("Frequency") +
   stat_bin(aes(label = ..count..), geom = "text", vjust = 0.5, size = 3)
 #ScatterPlot
-ggplot(fire_data, aes(x = X_id, y = number_of_responding_personnel)) +
+ggplot(fire_data, aes(x = `_id`, y = number_of_responding_personnel)) +
   geom_point(color = "orange", size = 2, shape = 16) +
   theme_minimal() +
   ggtitle("Scatterplot of Number of Responding Personnel vs. Incident ID") +
@@ -511,7 +512,7 @@ summary(fire_data$response_time)
 
 #### Save new analysis data ####
 fire_data$total_casualties <- fire_data$civilian_casualties + fire_data$tfs_firefighter_casualties
-write_csv(fire_data, "data/02-analysis_data/updated_tfs_analysis_data")
+write_parquet(fire_data, "data/02-analysis_data/updated_tfs_analysis_data.parquet")
 
 
 #### Understand Potential Indicators of Severity ####

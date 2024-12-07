@@ -16,9 +16,10 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(fitdistrplus)
+library(arrow)
 
 #### Read data ####
-fire_data_current <- read_csv("data/02-analysis_data/severity_tfs_analysis_data")
+fire_data_current <- read_parquet("data/02-analysis_data/severity_tfs_analysis_data.parquet")
 
 #### fire_alarm_system_operation ####
 

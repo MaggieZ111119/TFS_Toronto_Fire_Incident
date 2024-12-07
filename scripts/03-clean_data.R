@@ -11,6 +11,7 @@
 library(tidyverse)
 library(dplyr)
 library(lubridate)
+library(arrow)
 
 #### Load data ####
 raw_data <- read_csv("data/01-raw_data/raw_fire_data.csv")
@@ -96,4 +97,4 @@ clean_data$response_time <- as.numeric(difftime(clean_data$tfs_arrival_time,
 
 
 #### Save data ####
-write_csv(clean_data, "data/02-analysis_data/tfs_analysis_data")
+write_parquet(clean_data, "data/02-analysis_data/tfs_analysis_data.parquet")

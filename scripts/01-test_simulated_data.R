@@ -12,9 +12,10 @@
 
 #### Workspace setup ####
 library(tidyverse)
+library(arrow)
 
-simulated_data <- read_csv("data/00-simulated_data/simulated_data.csv")
-analysis_data <- read_csv("data/02-analysis_data/tfs_analysis_data")
+simulated_data <- read_parquet("data/00-simulated_data/simulated_data.parquet")
+analysis_data <- read_parquet("data/02-analysis_data/tfs_analysis_data.parquet")
 
 # Test if the simulated data was successfully loaded
 if (exists("simulated_data")) {

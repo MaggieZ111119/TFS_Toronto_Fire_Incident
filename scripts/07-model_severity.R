@@ -13,9 +13,10 @@ library(tidyverse)
 library(dplyr)
 library(caret)
 library(xgboost)
+library(arrow)
 
 #### Read data ####
-fire_data_model <- read_csv("data/02-analysis_data/severity_tfs_analysis_data")
+fire_data_model <- read_parquet("data/02-analysis_data/severity_tfs_analysis_data.parquet")
 
 #### Prepare Data ####
 

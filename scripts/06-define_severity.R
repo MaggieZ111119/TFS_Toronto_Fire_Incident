@@ -16,9 +16,10 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(fitdistrplus)
+library(arrow)
 
 #### Read data ####
-fire_data_model <- read_csv("data/02-analysis_data/updated_tfs_analysis_data")
+fire_data_model <- read_parquet("data/02-analysis_data/updated_tfs_analysis_data.parquet")
 
 #### Quantify Severity ####
 
@@ -80,9 +81,9 @@ fire_data_model <- fire_data_model %>%
 
 
 #### Save Data ####
-write_csv(fire_data_model, "data/02-analysis_data/severity_tfs_analysis_data")
+write_parquet(fire_data_model, "data/02-analysis_data/severity_tfs_analysis_data.parquet")
 
-fire_data_model <- read_csv("data/02-analysis_data/severity_tfs_analysis_data")
+fire_data_model <- read_parquet("data/02-analysis_data/severity_tfs_analysis_data.parquet")
 
 
 #### Understand what is related to Severity ####

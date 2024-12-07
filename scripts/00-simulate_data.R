@@ -9,12 +9,14 @@
 
 #### Workspace setup ####
 library(tidyverse)
+library(arrow)
+
 set.seed(1009633096)
 
 
 #### Simulate data ####
 
-clean_data <- read_csv("data/02-analysis_data/tfs_analysis_data")
+clean_data <- read_parquet("data/02-analysis_data/tfs_analysis_data.parquet")
 
 #number of rows
 n_simulated <- nrow(clean_data)
@@ -120,4 +122,4 @@ simulated_data <- data.frame(
 
 
 #### Save data ####
-write_csv(simulated_data, "data/00-simulated_data/simulated_data.csv")
+write_parquet(simulated_data, "data/00-simulated_data/simulated_data.parquet")

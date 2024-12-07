@@ -11,8 +11,9 @@
 
 #### Workspace setup ####
 library(tidyverse)
+library(arrow)
 
-analysis_data <- read_csv("data/02-analysis_data/tfs_analysis_data")
+analysis_data <- read_parquet("data/02-analysis_data/tfs_analysis_data.parquet")
 raw_data <- read_csv("data/01-raw_data/raw_fire_data.csv")
 
 
