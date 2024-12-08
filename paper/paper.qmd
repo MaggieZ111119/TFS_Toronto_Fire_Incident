@@ -175,7 +175,7 @@ ggplot(fire_data, aes(x = response_time)) +
 To understand the distribution of various categorical and numerical variables in the fire incident dataset, I visualized each variable along with its distribution and reviewed its summary statistics. The goal is to gain insights into the key characteristics of the data, which will support the later stages of analysis and modeling. Can check @sec-appendix for visualization/summary of the distribution of all variables. Below are a few important variables considered:
 
 1.  **Area of Origin**:\
-    This is a categorical variable that indicates the location within a building or structure where a fire started. Initially, this variable had over 100 categories, so the goal was to categorize these locations into broader groups for easier interpretation and analysis. I grouped the areas into categories such as "Residential and Living Spaces," "Cooking and Dining Areas," and "Storage and Utility Areas," among others. These groups were then visualized to better understand the most common fire origins within the dataset (see @fig-area-origin-distribution). Among all categories, Cooking and Dinning area stands out to be the area which most fire originate from. Living space and Transportation area also has a great amount to incidence occured.
+    This is a categorical variable that indicates the location within a building or structure where a fire started. Initially, this variable had over 100 categories, so the goal was to categorize these locations into broader groups for easier interpretation and analysis. I grouped the areas into categories such as "Residential and Living Spaces," "Cooking and Dining Areas," and "Storage and Utility Areas," among others. These groups were then visualized to better understand the most common fire origins within the dataset (see @fig-area-origin-distribution). Among all categories, Cooking and Dinning area stands out to be the area which most fire originate from. Living space and Transportation area also has a great amount to incidence occurred.
 
 ```{r}
 #| label: fig-area-origin-distribution
@@ -1145,7 +1145,7 @@ Upon reviewing the 17 initially selected variables of interest, I observed that 
 
 ```{r}
 #| label: tbl-missing-overview
-#| fig-cap: This table shows the percentage of missing values for each variable of interest. Variables such as 'area_of_origin,' 'building_status,' and 'business_impact' exhibit high missing percentages, indicating potential areas for further investigation or data imputation, while others like '_id' and 'final_incident_type' have negligible missing values. Understanding these missing values is crucial for the completeness and quality of the analysis..
+#| tbl-cap: This table shows the percentage of missing values for each variable of interest. Variables such as 'area_of_origin,' 'building_status,' and 'business_impact' exhibit high missing percentages, indicating potential areas for further investigation or data imputation, while others like '_id' and 'final_incident_type' have negligible missing values. Understanding these missing values is crucial for the completeness and quality of the analysis..
 #| warning: false
 #| message: false
 #| echo: false
@@ -1176,7 +1176,7 @@ After dealing with columns with a big proportion of missing values, removing row
 
 Below are the plots or summary statistics showing the distribution of all variables of interest in the analysis dataset, after cleaning and removing columns. This includes the created variable 'Response Time.'. The description of each variable is sourced from the data portal in Open Data Toronto \[@TFSfireedata\].
 
-1.  **Area of Origin**: OFM Area of Origin code and description, specifying where the fire started. This information will contribute to the understanding what are some origins of fire and how it may influence fire severity or outcomes. 75 different recorded origins, grouped into 11 larger groups. (see @fig-area-origin-distr)
+1.  **Area of Origin**: OFM Area of Origin code and description, specifying where the fire started. This information will contribute to the understanding what are some origins of fire and how it may influence fire severity or outcomes. 75 different recorded origins, grouped into 11 larger groups. (see @fig-area-origin-distribution)
 2.  **Civilian Casualties**: Count of civilian casualties (injuries or fatalities). This is directly relates to the severity of fire incidents.(see @tbl-civilian-casualties-summary) 
 3.  **Estimated Dollar Loss**: Estimated financial loss caused by the fire. This is directly relates to the severity of fire incidents. (see @tbl-estimatedloss)
 
@@ -1312,7 +1312,7 @@ kable(table(fire_data$sprinkler_system_presence), col.names = c("sprinkler_syste
 #| warning: false
 #| message: false
 #| label: fig-fire-incidents-by-year
-#| fig-caption: This bar chart shows the number of fire incidents by year, from 2011 to 2023.
+#| fig-cap: This bar chart shows the number of fire incidents by year, from 2011 to 2023.
 ## 12. tfs_alarm_time ## 
 fire_data$year <- year(fire_data$tfs_alarm_time)
 fire_data$month <- month(fire_data$tfs_alarm_time)
@@ -1324,10 +1324,8 @@ ggplot(fire_data, aes(x = year)) +
   geom_text(stat = "count", aes(label = ..count..), vjust = -0.5, size = 3) + 
   labs(title = "Fire Incidents by Year", x = "Year", y = "Incident Count") +
   theme_minimal() +
-  scale_x_continuous(breaks = seq(min(fire_data$year), max(fire_data$year), by = 1))
-theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
+  scale_x_continuous(breaks = seq(min(fire_data$year), max(fire_data$year), by = 1)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # Table
 
@@ -1342,7 +1340,7 @@ theme(axis.text.x = element_text(angle = 45, hjust = 1))
 #| warning: false
 #| message: false
 #| label: fig-year-month-incident-count
-#| tbl-cap: Monthly Incident Count by Year (Excluding 2022 and 2023 becasue from prvious plot, we can see they don't contribute much information)
+#| fig-cap: Monthly Incident Count by Year (Excluding 2022 and 2023 becasue from prvious plot, we can see they don't contribute much information)
 
 # from year plot, we can see that 2022 and 2023 does not provide much information so we can droped them.
 fire_data_filtered <- fire_data |>
@@ -1357,8 +1355,8 @@ ggplot(incident_count_by_year_month_ex, aes(x = month, y = count)) +
   geom_bar(stat = "identity", fill = "lightcoral", color = "black") +
   labs( x = "Month", y = "Incident Count") +
   scale_x_discrete(
-    breaks = 1:12,  # Show all months (1 to 12)
-    labels = month.name  # Use full month names
+    breaks = 1:12,
+    labels = month.name 
   ) +
   facet_wrap(~year, scales = "fixed") +  # Fix the y-axis scale for comparison
   theme_minimal() +
