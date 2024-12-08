@@ -62,6 +62,7 @@ We use the statistical programming language R [@citeR]to investigate data about 
 library(tidyverse)
 library(dplyr)
 library(lubridate)
+library(kableExtra)
 
 #### Load original data ####
 raw_data <- read_csv(file = here::here("data/01-raw_data/raw_fire_data.csv"))
@@ -79,7 +80,10 @@ clean_data <- raw_data[, columns_to_keep]
 colnames(clean_data) <- tolower(gsub(" ", "_", colnames(clean_data)))
 
 ### Preview data ###
-kable(head(clean_data, 6))
+head_table <- head(clean_data)
+kable(head(head_table)) |>
+  kable_styling(latex_options = c("scale_down"))
+
 ```
 
 ## Measurement
@@ -135,25 +139,12 @@ I have selected 17 variables to begin my exploration of the dataset:
 By focusing on these 17 variables, I aim to uncover meaningful patterns and insights that can support fire safety improvements across the city.
 
 ## Data Cleaning
+
 The raw dataset was stored in its original csv format to ensure data integrity and reproducibility, and later analysis data after cleaning and processing is saved into parquet file using `write_parquet` function in `arrow` package [@arrow2024].
 
 After loading the original raw data, I selected the columns of interest as explained in the previous section. These columns were then renamed to lowercase, and spaces were replaced with underscores to ensure consistency. After reviewing the data, I kept in mind that this study focuses on the relationship between ignition sources and fire severity. As a result, I removed rows with "Undetermined" ignition sources.
 
 Since there are time-related variables in the dataset, I converted them to the POSIX format. Additionally, I noticed the presence of several missing (NA) and null values. Given that the dataset contains numerous categorical variables, I considered how to handle missing data differently for these types. I first examined whether any columns contained too little information to provide valuable insights into fire severity or its predictors. After calculating, I decided to remove columns with more than 20% missing data, carefully considering their relevance to the study.
-
-Variables removed:
-
-1.  **Building_Status**: This column provides information on the condition of the building, but it is not directly related to the core objectives of the study, which focus on fire severity, casualties, and financial losses. With more than 20% missing data, it was deemed unnecessary.
-
-2.  **Business_Impact**: While this column tracks the impact of the fire on businesses, it overlaps with the **Estimated_Dollar_Loss** column, which provides more comprehensive financial data. Due to the high missing rate, this column was removed.
-
-3.  **Exposures**: This column captures the number of exposure fires but does not directly contribute to understanding fire severity or its impact on casualties and losses. With more than 20% missing data, it was excluded from the analysis.
-
-Kept variables: The remaining variables are essential for the completeness of the analysis. For categorical data entries, missing values are replaced with “unreported.”
-
--   **Fire_Alarm_System_Operation**: This variable is crucial because the study aims to understand fire infrastructure.
-
--   **Sprinkler_System_Presence**: This is also an important variable for understanding fire safety. Given that there are fewer variables under "Safety Infrastructure," it is essential to retain them.
 
 To maintain data quality, rows with more than 30% missing data are removed. After ensuring that there are no missing values in the dataset, a new variable, Response_Time, is created to calculate the time difference (in minutes) between TFS_Alarm_Time and TFS_Arrival_Time (see @fig-response-time-distribution). This new variable will help analyze fire response efficiency and is a key indicator for the study.
 
@@ -962,6 +953,7 @@ From the ROC curve, we can tell that it minimizes false negatives more in focus.
 In fact, the cost of missing high-severity fires is far greater than the cost of false positives. While false positives may lead to overreaction, failing to detect a severe fire could escalate into a major disaster, resulting in significant financial losses and potentially causing more casualties. Therefore, a model that is tuned to minimize false negatives is preferable, as it prioritizes catching severe fires—even at the expense of some false positives. However, I will continue to fit additional models to strike a better balance between specificity and sensitivity.
 
 ## Limitations and Biases in the Data {#sec-second-point}
+
 ### Potential Bias
 
 The fire incidence dataset includes several categorical variables such as Ignition Source, Possible Cause, and Initial Types. During data collection, these variables, which have a limited range of categories, may introduce various types of bias.
@@ -1055,7 +1047,6 @@ Using other factors, such as ignition sources (see @fig-ignitionsources), which 
 #| label: fig-ignitionsources
 #| fig-cap: This plot shows the top 5 ignition sources for each fire severity level (Low, Medium, High). The bar chart illustrates how different ignition sources contribute to fire severity, with separate plots for each level of severity. For example, fires originating from electrical units or lightning equipment may have a higher chance of being severe incidents. By understanding these patterns, fire reporting can be more effective, allowing for better decision-making and resource allocation.
 
-#### Understand what is related to Severity ####
 
 ## Factor of Ignition Source ##
 # Convert Severity and ignition_source_grouped to factors
@@ -1095,19 +1086,19 @@ ggplot(fire_data_filtered, aes(x = ignition_source_grouped, fill = ignition_sour
 
 ```
 
-
 \newpage
 
 \appendix
 
-# Appendix {-}
+# Appendix {.unnumbered}
 
-# Data and Variable Selection
+# Variable Selection and Visualization
 
 ```{r}
-#| include: false
+#| inlcude: false
 #| warning: false
 #| message: false
+#| echo: false
 #### Workspace setup ####
 library(dplyr)
 library(ggplot2)
@@ -1115,24 +1106,79 @@ library(tidyr)
 library(lubridate)
 library(knitr)
 
-#### Read data ####
-fire_data <- read_parquet(here::here("data/02-analysis_data/tfs_analysis_data.parquet"))
-#### Data Overview ####
-# Structure
-head(fire_data)
-str(fire_data)
 
-# Missing Value
-missing_data <- colSums(is.na(fire_data))
-print(missing_data)
+# Since I want to study possible sources leading to different severity of fire, no info about sources should be dropped
+clean_data <- clean_data |>
+  filter(ignition_source != "999 - Undetermined")
+
+### Ensure Datetime Consistency ###
+
+# Convert timestamps to POSIXct format (YYYY-MM-DD HH:MM:SS)
+clean_data$tfs_alarm_time <- ymd_hms(clean_data$tfs_alarm_time)  
+clean_data$tfs_arrival_time <- ymd_hms(clean_data$tfs_arrival_time) 
+clean_data <- clean_data[!is.na(clean_data$tfs_alarm_time), ]
+clean_data <- clean_data[!is.na(clean_data$tfs_arrival_time), ]
 
 ```
 
-This appendix contains all plot/summary distribution of all variables in interested choose in analysis data set.
+## Variables Selection Criterion
 
-1.  Are of Origin (see @fig-area-origin-distribution)
-2.  Civilian Casualties (see @tbl-civilian-casualties-summary)
-3.  Estimated Dollar Loss (see @tbl-estimatedloss)
+From this comprehensive dataset which included 43 vairables, I first selected the variables that are most relevant to my topic of study, leaving a total of 17 variables. Variables that are not essential to the study's focus include:
+
+**Geographical Information of Incidence**: The study focuses on analyzing fire data for Toronto as a whole. Geographic details such as the specific station area, ward, or intersection are not critical to determining severity levels. Including these could even divert focus from more relevant variables.
+
+-   `Latitude`, `Longitude`, `Incident_Station_Area`, `Incident_Ward`, and `Intersection`.
+
+**Some Safety System-Related Variables**: The study aims to study some infrasture system suhc as alarm and sprinkler systems. Some variables providing redundant information about these systems were excluded. The dataset also included variables on smoke alarm systems; however, due to the excessive number of null values, these variables were excluded as they made meaningful analysis challenging.
+
+-   `Fire_Alarm_System_Presence`, `Fire_Alarm_System_Impact_on_Evacuation`, `Smoke_Alarm_at_Fire_Origin`, `Smoke_Alarm_at_Fire_Origin_Alarm_Failure`, `Smoke_Alarm_at_Fire_Origin_Alarm_Type`, and `Sprinkler_System_Operation`.
+
+**Repeated Information**: Certain variables contained information that overlapped with variables already chosen for inclusion. To simplify the analysis, these redundant features were removed.
+
+-   `Count_of_Persons_Rescued`, `Estimated_Number_Of_Persons_Displaced`, `Material_First_Ignited`, `Initial_CAD_Event_Type`, `Level_Of_Origin`, `Extent_Of_Fire`, `Status_of_Fire_On_Arrival`, and `Property_Use`.
+
+**Unnecessary Details**: There are detailes in the dataset that is not directly related to the purpose of this study. Incident-specific details, such as how long firefighters took to respond or clear the fire, are more relevant for evaluating operational efficiency. These do not directly contribute to understanding the severity levels.
+
+-   `Ext_agent_app_or_defer_time`, `Fire_Under_Control_Time`, `Last_TFS_Unit_Clear_Time`, `Method_Of_Fire_Control`, and `Incident_Number`.
+
+Upon reviewing the 17 initially selected variables of interest, I observed that some columns contain a significant proportion of missing values (NAs), see @tbl-missing-overview. As a result, certain columns (with more than 20% missing data) should be considered for removal if their relevance to the study topic is not as significant as other variables that should remain.
+
+```{r}
+#| label: tbl-missing-overview
+#| fig-cap: This table shows the percentage of missing values for each variable of interest. Variables such as 'area_of_origin,' 'building_status,' and 'business_impact' exhibit high missing percentages, indicating potential areas for further investigation or data imputation, while others like '_id' and 'final_incident_type' have negligible missing values. Understanding these missing values is crucial for the completeness and quality of the analysis..
+#| warning: false
+#| message: false
+#| echo: false
+# Missing Value
+missing_values <- colSums(is.na(clean_data))
+missing_percentage <- round((missing_values / nrow(clean_data)) * 100, 2)
+missing_info_table <- data.frame(Missing_Percentage = missing_percentage)
+kable(missing_info_table)
+```
+
+The variables removed are:
+
+1.  **Building_Status**: This column provides information on the condition of the building, but it is not directly related to the core objectives of the study, which focus on fire severity, casualties, and financial losses. With more than 20% missing data, it was deemed unnecessary.
+
+2.  **Business_Impact**: While this column tracks the impact of the fire on businesses, it overlaps with the **Estimated_Dollar_Loss** column, which provides more comprehensive financial data. Due to the high missing rate, this column was removed.
+
+3.  **Exposures**: This column captures the number of exposure fires but does not directly contribute to understanding fire severity or its impact on casualties and losses. With more than 20% missing data, it was excluded from the analysis.
+
+Kept variables: These variables are essential for the completeness of the analysis. Since all of them are categorical data entries, missing values are replaced with “unreported.”
+
+-   **Fire_Alarm_System_Operation**: This variable is crucial because the study aims to understand fire infrastructure.
+
+-   **Sprinkler_System_Presence**: This is also an important variable for understanding fire safety. Given that there are fewer variables under "Safety Infrastructure," it is essential to retain them.
+
+After dealing with columns with a big proportion of missing values, removing rows with a certain amount of missing values would still remain in a relatively representative dataset. Therefore, I decided to remove any columns with more than 30% missing values to the usability of the dataset fro analysis.
+
+## Distribution and Summary of Cleaned Variables
+
+Below are the plots or summary statistics showing the distribution of all variables of interest in the analysis dataset, after cleaning and removing columns. This includes the created variable 'Response Time.'. The description of each variable is sourced from the data portal in Open Data Toronto \[@TFSfireedata\].
+
+1.  **Area of Origin**: OFM Area of Origin code and description, specifying where the fire started. This information will contribute to the understanding what are some origins of fire and how it may influence fire severity or outcomes. 75 different recorded origins, grouped into 11 larger groups. (see @fig-area-origin-distr)
+2.  **Civilian Casualties**: Count of civilian casualties (injuries or fatalities). This is directly relates to the severity of fire incidents.(see @tbl-civilian-casualties-summary) 
+3.  **Estimated Dollar Loss**: Estimated financial loss caused by the fire. This is directly relates to the severity of fire incidents. (see @tbl-estimatedloss)
 
 ```{r}
 #| echo: false
@@ -1154,8 +1200,8 @@ kable(summary(est_loss_df))
 
 ```
 
-4.  Final Incidence Type (see @fig-final-incident-type-distribution)
-5.  Fire Alram Conditions (see @fig-firealarmsystem)
+4.  **Final Incidence Type**: Final classification of the fire incident This can  give information about the nature of the incident, helpful to determine severity. (see @fig-final-incident-type-distribution)
+5.  **Fire Alarm System Operation**: Describes the operation of fire alarm systems during the incident. This is important for assessing the role of alarms, this is a part of fire infrastructure.(see @fig-firealarmsystem)
 
 ```{r}
 #| echo: false
@@ -1164,6 +1210,7 @@ kable(summary(est_loss_df))
 #| message: false
 #| label: fig-firealarmsystem
 #| fig-cap: This bar chart shows the distribution of fire alarm system operation types. It highlights the frequency of each type of fire alarm system operation. Operated successfully most of the time.
+
 
 ## 5. Fireground Conditions (Categorical) ##
 # Plot
@@ -1179,8 +1226,8 @@ ggplot(fire_data, aes(x = fire_alarm_system_operation)) +
 
 ```
 
-6.  Ignition Source (see @fig-grouped-ignition-source-distribution)
-7.  Number of Responding Apparatus (See @fig-responding-apparatus)
+6.  **Ignition Source**: OFM Ignition Source code and description, detailing how the fire started. This is for understanding factors that contribute to fire ignition (see @fig-grouped-ignition-source-distribution)
+7.  **Number of Responding Apparatus**: Number of TFS apparatus that responded to the incident. This may correlate with the severity as it reflects the scale of response. (See @fig-responding-apparatus)
 
 ```{r}
 #| echo: false
@@ -1199,7 +1246,7 @@ ggplot(fire_data, aes(x = number_of_responding_apparatus)) +
 
 ```
 
-8.  Number of Responding Personnel (See @fig-responding-personnel-hist)
+8.  **Number of Responding Personnel**: Number of TFS personnel that responded to the incident. This reflect the magnitude of resources deployed, could relate with fire’s severity similar as `Number_of_Responding_Apparatus`. (See @fig-responding-personnel-hist)
 
 ```{r}
 #| echo: false
@@ -1220,7 +1267,7 @@ ggplot(fire_data, aes(x = number_of_responding_personnel)) +
 
 ```
 
-9.  Possible Cause (See @tbl-possible-cause-full)
+9.  **Possible Cause**: OFM Possible Cause code and description, explaining the potential cause of the fire. This tells the circumstances leading to the fire. (See @tbl-possible-cause-full)
 
 ```{r}
 #| echo: false
@@ -1241,7 +1288,7 @@ cause_table_df <- as.data.frame(cause_table) |>
 kable(cause_table_df, col.names = c("Possible Cause", "Frequency"))
 ```
 
-11. Sprinkler System Presence (@tbl-sprinkler-system)
+11. **Sprinkler System Presence**: Describes whether a sprinkler system was present at the location. This provided information of the sprinkler system, which is also a part of fire infrastructure. (see @tbl-sprinkler-system)
 
 ```{r}
 #| echo: false
@@ -1257,7 +1304,7 @@ kable(table(fire_data$sprinkler_system_presence), col.names = c("sprinkler_syste
 
 ```
 
-12. tfs_alarm_time (Amount of Fire Incidents by Year, see @fig-fire-incidents-by-year) (Fire Incidents by Month and Year, See @fig-year-month-incident-count)
+12. **TFS Alarm Time**: Time stamp of when TFS was notified of the incident. This useful when analyzing response times and their impact on severity, as well as learning about the amount of incidents across times.(Amount of Fire Incidents by Year, see @fig-fire-incidents-by-year) (Fire Incidents by Month and Year, see @fig-year-month-incident-count)
 
 ```{r}
 #| echo: false
@@ -1327,7 +1374,7 @@ ggplot(incident_count_by_year_month_ex, aes(x = month, y = count)) +
 
 ```
 
-14. Firefighter Casualties (See @fig-firefighter-casulties)
+14. **Firefighter Casualties**: Count of TFS firefighter casualties (injuries or fatalities). This is useful when determining the severity of fire. (See @fig-firefighter-casulties)
 
 ```{r}
 #| echo: false
@@ -1352,10 +1399,7 @@ ggplot(casualties_df, aes(x = "", y = Freq, fill = factor(Var1))) +
 #table(fire_data$tfs_firefighter_casualties)
 ```
 
-15. Response Time (See @fig-response-time-distribution)
-
-
-
+15. **Response Time**: This is created variable. It is calculated as the difference between the `TFS_Alarm_Time` (when the fire service is notified of the incident) and the `TFS_Arrival_Time`. (See @fig-response-time-distribution)
 
 \newpage
 
