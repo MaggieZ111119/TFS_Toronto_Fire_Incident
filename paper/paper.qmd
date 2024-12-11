@@ -48,7 +48,6 @@ The remainder of this paper is structured as follows. [@sec-data] describes the 
 In this paper, I used several R packages for data analysis and visualization. The `tidyverse`[@wickham2023tidyverse], `dplyr`[@wickham2023dplyr], and `tidyr`[@wickham2023tidyr] were used for data manipulation. `ggplot2`[@wickham2016ggplot2] facilitated data visualization, while `lubridate`[@grolemund2011lubridate] was used for date-time handling. `knitr`[@xie2023knitr] helped integrate code into reports. For modeling, I used `rstanarm`[@gelman2020rstanarm] and `modelsummary`[@fox2021modelsummary] for summaries, `caret`[@kuhn2023caret] for model training, and `xgboost`[@chen2016xgboost] for boosting. Additional tools like `rpart`[@therneau2015rpart], `fitdistrplus`[@delignette-muller2023fitdistrplus], and `pROC`[@robin2023pROC] supported partitioning, distribution fitting, and model evaluation.
 
 # Data {#sec-data}
-
 ## Overview
 
 We use the statistical programming language R [@citeR]to investigate data about fire incidents[@TFSfireedata], downloaded from the Open Data Toronto Portal: https://open.toronto.ca/dataset/fire-incidents/ . The dataset was last updated on December 31, 2023. It includes fire incidents following the Ontario Fire Marshal's (OFM) definition, with descriptions according to OFM standards. The dataset also provides detailed information on Toronto Fire Services' (TFS) responses to each fire incident. The data is mostly complete, though some incidents are still under investigation and categorized as "no loss outdoor fire." The dataset includes information on the origin of fires, impacts on civilians and buildings, as well as geographical data (see @tbl-preview-data). Additionally, it contains details on TFS response times and actions taken. Overall, the dataset is comprehensive, informative, and provides valuable insights for my later study.
@@ -347,18 +346,20 @@ kable(civilian_casualties_df)
 #| label: fig-final-incident-type-distribution
 #| fig-cap: Bar plot illustrating the distribution of final incident types across fire incidents. The plot presents the frequency of each incident type, with the count displayed on top of the bars. We can see that there is much more fire than explotion.
 #| echo: false
+#| fig.width: 3
+#| fig.height: 2
 
 ggplot(fire_data, aes(x = final_incident_type)) +
   geom_bar(fill = "purple") +
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1), 
+    axis.text.x = element_text(angle = 45, hjust = 1,size =6), 
     plot.margin = margin(10, 10, 10, 10)  # Add space around the plot
   ) +
   scale_x_discrete(labels = function(x) sapply(x, function(y) paste(head(strsplit(y, " ")[[1]], 3), collapse = " "))) +
   xlab("Final Incident Type") +
   ylab("Frequency") +
-  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5)
+  geom_text(stat = "count", aes(label = ..count..), vjust = 0.5, size = 2)
 
 ```
 
@@ -499,6 +500,8 @@ To explore the relationship between financial losses and casualties, incidents w
 #| fig-cap: Heatmap illustrating the relationship between financial loss and casualty groups in fire incidents. The plot categorizes incidents based on financial loss and total casualties, with the color intensity representing the frequency of incidents in each combination of loss and casualty group. This provides insights into the severity of fire incidents, highlighting areas with higher financial losses and casualties. We can see that there are greater anount in 1k -10k region.
 #| echo: false
 #| warning: false
+#| fig.width: 3
+#| fig.height: 2
 
 ## Financial loss vs. Casualties ##
 fire_data$total_casualties <- fire_data$civilian_casualties + fire_data$tfs_firefighter_casualties
@@ -524,6 +527,7 @@ severity_table <- fire_data |>
   group_by(loss_group, casualty_group) |>
   summarize(count = n())
 
+
 ggplot(severity_table, aes(x = loss_group, y = casualty_group, fill = count)) +
   geom_tile(color = "white") +
   scale_fill_gradient(low = "lightblue", high = "darkblue") +
@@ -532,7 +536,10 @@ ggplot(severity_table, aes(x = loss_group, y = casualty_group, fill = count)) +
     y = "Casualty Group",
     fill = "Incident Count"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 20, hjust = 0.5,size =6)
+  ) 
 
 ```
 
@@ -542,6 +549,8 @@ The scatter plot below showcases the relationship between the number of respondi
 #| label: fig-responding-apparatus-vs-log-dollar-loss
 #| fig-cap: Scatter plot showing the relationship between the number of responding apparatus and the log-transformed financial loss in fire incidents. Each point represents a fire incident, with the x-axis displaying the log of the financial loss (with a 1 added for stability) and the y-axis showing the number of responding apparatus. There is a slight trend observed, indicating potential relationship.
 #| echo: false
+#| fig.width: 3
+#| fig.height: 2
 
 fire_data$Log_Dollar_Loss <- log(fire_data$estimated_dollar_loss + 1)
 
@@ -557,8 +566,9 @@ ggplot(fire_data, aes(y = number_of_responding_apparatus, x = Log_Dollar_Loss)) 
 
 ```
 
-# Model {#sec-model}
 
+
+# Model {#sec-model}
 ## Define Severity
 
 The severity of fire incidents was categorized based on three key factors: the number of responding fire apparatus, the estimated dollar loss, and the total number of casualties. First, the total number of responding apparatus from TFS was calculated and divided into bins after plotting and observing its distribution. Each incident was assigned to a bin based on how many apparatus responded, helping categorize incidents in terms of the scale of response.
@@ -682,7 +692,7 @@ To prepare the target variable, the `severity` variable calculated earlier was t
 
 To evaluate model performance, the dataset was split into a training set (80%) and a testing set (20%) using the `createDataPartition()` function from the `caret` package in R [@citeR].
 
-## Model Explnation
+## Model Explanation
 
 A logistic regression model was chosen because the outcome variable, Severity_high, is binary (0/1), and logistic regression is well-suited for binary classification tasks, especially when working with categorical predictor variables. The logistic regression model used the following predictors. The logistic regression model was initially fitted to the training dataset using the formula: ***Severity_high \~ area_of_origin_grouped + ignition_source_grouped.*** This initial model can be expressed as:
 
@@ -694,6 +704,11 @@ Where: $P$ is the probability of the event: $P(\text{Severity\_high}=1)$.\
 $\text{logit}(P)$ is the log-odds of the probability.\
 $\beta_0$ is the intercept.\
 $\beta_1, \beta_2, \dots, \beta_k$ are the coefficients of the predictor variables $X_1, X_2, \dots, X_k$.
+
+## Model Limitation
+The logistic regression model has several limitations. First, it only considers predictors such as area of origin and ignition source, excluding potentially significant factors like weather conditions and building materials, which could affect fire severity. Additionally, the model assumes that the relationships between predictors and severity are linear, which may not fully capture the complexity of fire incidents. Most importantly, the categorization of severity is based on predetermined thresholds, which may not be universally applicable, as different contexts may require different severity definitions. Lastly, the model's predictive accuracy is influenced by the quality of the data.
+
+Notably, there is a slight class imbalance in the dataset, high-severity incidents are underrepresented. In the training dataset, only 74 out of 10,237 records are classified as high severity. This imbalance can affect the model’s accuracy and its ability to predict high-severity incidents effectively.
 
 ## Model Justification
 
@@ -711,8 +726,8 @@ The model's performance was also assessed using the Akaike Information Criterion
 
 The updated logistic regression model was evaluated using the receiver operating characteristic (ROC) curve, with predictions made on the test dataset. The curve was plotted to assess the model’s ability to discriminate between high and low-severity fire incidents. The area under the curve (AUC) is a key metric for model performance; higher AUC values indicate better model performance [@metz1978basic]. The simpler model, after removing insignificant predictors, combined with its performance on the test set, provides a better understanding of the relationship between fire characteristics and severity.
 
-# Results {#sec-results}
 
+# Results {#sec-results}
 ## Logistic Regression Model Results
 
 The logistic regression model was fitted to predict the probability of high severity fire incidents based on the categorical variables **area of origin**. The final model keep only significant predictors based on p-values and col-linearity diagnostics. below is a summary ( see @fig-logisticresults-summary) of the model's estimates. The coefficients of each predictor. And Also included other information about model evaluation. It's noticeable that RMSE is not ideal, but this is already an improvement from the initial model.
@@ -724,7 +739,9 @@ The logistic regression model was fitted to predict the probability of high seve
 #| message: false
 #| label: fig-logisticresults-summary
 #| fig-cap: "Table showing the summary of logistic regression model estimates for predicting fire severity. The table includes coefficients for each significant predictor, their standard errors, z-values, and associated p-values. Significant predictors are highlighted, with p-values less than 0.05 indicating statistical significance. The results provide insights into the relationship between 'Area of Origin' and the likelihood of high-severity fire incidents."
-
+#| fig.align: left
+#| fig.width: 6
+#| fig.height: 4
 library(rstanarm)
 library(modelsummary)
 library(tidyverse)
@@ -772,8 +789,14 @@ logistic_summary <- summary(logistic_model)
 # Access the coefficients table
 coefficients_table <- logistic_summary$coefficients
 
+rownames(coefficients_table) <- gsub(
+  "area_of_origin_grouped", "Area of Origin: ", 
+  gsub("([a-z])([A-Z])", "\\1 \\2", rownames(coefficients_table)) # Add space before capital letters
+)
+
 # Print or work with the coefficients
-kable(coefficients_table)
+kable(coefficients_table, digits = 2)
+
 ```
 
 The estimated coefficients for the significant predictor (`area_of_origin`) are visualized to interpret the relative influence of different categories below (@fig-logesiticresults). We can tell most categories are relative to the severity of fire incidence. For example, Fire from mechanical, HVAC, and electrical Areas are highly contributing to the occurrence of ore sever fire incidence.
@@ -1187,6 +1210,9 @@ Below are the plots or summary statistics showing the distribution of all variab
 #| message: false
 #| label: tbl-estimatedloss
 #| tbl-cap: The table summarizes the distribution of estimated dollar losses from fire incidents.
+#| fig.width: 3
+#| fig.height: 2
+
 library(knitr)
 
 ## 3. Estimated Dollar Loss (Numerical) ##
@@ -1197,7 +1223,6 @@ kable(summary(est_loss_df))
 # Summary table
 # Plot
 # (No plot code provided in the original snippet)
-
 ```
 
 4.  **Final Incidence Type**: Final classification of the fire incident This can  give information about the nature of the incident, helpful to determine severity. (see @fig-final-incident-type-distribution)
@@ -1236,13 +1261,16 @@ ggplot(fire_data, aes(x = fire_alarm_system_operation)) +
 #| message: false
 #| label: fig-responding-apparatus
 #| fig-cap: This histogram illustrates the distribution of the number of responding apparatus for fire incidents. The x-axis represents the number of apparatus dispatched, while the y-axis shows the frequency of incidents. The date is right skewed, closer to 1.
+#| fig.width: 3
+#| fig.height: 2
+
 ## 7. Number of Responding Apparatus (Numerical) ##
 ggplot(fire_data, aes(x = number_of_responding_apparatus)) +
   geom_histogram(bins = 30, fill = "cyan", color = "black") +
   theme_minimal() +
   xlab("Number of Responding Apparatus") +
   ylab("Frequency") +
-  stat_bin(aes(label = ..count..), geom = "text", vjust = -0.5, size = 3)
+  stat_bin(aes(label = ..count..), geom = "text", vjust = -0.5, size = 2)
 
 ```
 
@@ -1255,6 +1283,9 @@ ggplot(fire_data, aes(x = number_of_responding_apparatus)) +
 #| message: false
 #| label: fig-responding-personnel-hist
 #| fig-cap: This histogram shows the distribution of the number of responding personnel for fire incidents. The x-axis indicates the number of personnel dispatched, while the y-axis represents the frequency of such incidents. Similar dsitribution as @fig-responding-apparatus. 
+#| fig.width: 3
+#| fig.height: 2
+
 # 8. Number of Responding Personnel (Numerical) ##
 #Plot
 ggplot(fire_data, aes(x = number_of_responding_personnel)) +
@@ -1263,7 +1294,7 @@ ggplot(fire_data, aes(x = number_of_responding_personnel)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
   xlab("Number of Responding Personnel") +
   ylab("Frequency") +
-  stat_bin(aes(label = ..count..), geom = "text", vjust = 0.5, size = 3)
+  stat_bin(aes(label = ..count..), geom = "text", vjust = 0.5, size = 2)
 
 ```
 
@@ -1275,7 +1306,10 @@ ggplot(fire_data, aes(x = number_of_responding_personnel)) +
 #| warning: false
 #| message: false
 #| label: tbl-possible-cause-full
-#| tbl-cap: Comprehensive table showing all possible fire casues.
+#| tbl-cap: A comprehensive table showing top 6 possible fire casues.
+#| fig.width: 3
+#| fig.height: 2
+
 ## 9. Possible Cause ##
 #plot all that has frequency greater than 550
 filtered_data <- fire_data |>
@@ -1285,7 +1319,7 @@ filtered_data <- fire_data |>
 cause_table <- table(fire_data$possible_cause)
 cause_table_df <- as.data.frame(cause_table) |>
   arrange(desc(Freq))
-kable(cause_table_df, col.names = c("Possible Cause", "Frequency"))
+kable(head(cause_table_df), col.names = c("Possible Cause", "Frequency"))
 ```
 
 11. **Sprinkler System Presence**: Describes whether a sprinkler system was present at the location. This provided information of the sprinkler system, which is also a part of fire infrastructure. (see @tbl-sprinkler-system)
@@ -1313,6 +1347,9 @@ kable(table(fire_data$sprinkler_system_presence), col.names = c("sprinkler_syste
 #| message: false
 #| label: fig-fire-incidents-by-year
 #| fig-cap: This bar chart shows the number of fire incidents by year, from 2011 to 2023.
+#| fig.width: 3
+#| fig.height: 2
+
 ## 12. tfs_alarm_time ## 
 fire_data$year <- year(fire_data$tfs_alarm_time)
 fire_data$month <- month(fire_data$tfs_alarm_time)
@@ -1321,7 +1358,7 @@ fire_data$month <- as.numeric(fire_data$month)
 # Plot Number of Incidents by Year
 ggplot(fire_data, aes(x = year)) +
   geom_bar(fill = "lightblue", color = "black") +
-  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5, size = 3) + 
+  geom_text(stat = "count", aes(label = ..count..), vjust = 0, size = 2) + 
   labs(title = "Fire Incidents by Year", x = "Year", y = "Incident Count") +
   theme_minimal() +
   scale_x_continuous(breaks = seq(min(fire_data$year), max(fire_data$year), by = 1)) +
@@ -1341,6 +1378,8 @@ ggplot(fire_data, aes(x = year)) +
 #| message: false
 #| label: fig-year-month-incident-count
 #| fig-cap: Monthly Incident Count by Year (Excluding 2022 and 2023 becasue from prvious plot, we can see they don't contribute much information)
+#| fig.width: 5
+#| fig.height: 4
 
 # from year plot, we can see that 2022 and 2023 does not provide much information so we can droped them.
 fire_data_filtered <- fire_data |>
@@ -1361,15 +1400,15 @@ ggplot(incident_count_by_year_month_ex, aes(x = month, y = count)) +
   facet_wrap(~year, scales = "fixed") +  # Fix the y-axis scale for comparison
   theme_minimal() +
   theme(
-    strip.text.x = element_text(size = 10), 
-    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1.5, size = 8), 
-    axis.title.x = element_text(size = 12), 
-    axis.title.y = element_text(size = 12), 
+    strip.text.x = element_text(size = 6), 
+    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1.5, size = 4), 
+    axis.text.y = element_text(angle = 45, hjust = 1, vjust = 1.5, size = 4),
+    axis.title.x = element_text(size = 10), 
+    axis.title.y = element_text(size = 10), 
     strip.background = element_rect(fill = "lightblue", color = "black"), 
     panel.grid.major.x = element_blank(),
     panel.grid.minor.x = element_blank()
-  )
-
+  ) 
 ```
 
 14. **Firefighter Casualties**: Count of TFS firefighter casualties (injuries or fatalities). This is useful when determining the severity of fire. (See @fig-firefighter-casulties)
@@ -1381,6 +1420,8 @@ ggplot(incident_count_by_year_month_ex, aes(x = month, y = count)) +
 #| message: false
 #| label: fig-firefighter-casulties
 #| fig-cap: The Pie chart showing the distribution of firefighter casualties, rnaging from 0-3. With being the maximum amount of occurence.
+#| fig.width: 3
+#| fig.height: 2
 
 ## 14. Firefighter Casualties (Numerical) ##
 casualties_table <- table(fire_data$tfs_firefighter_casualties)
@@ -1393,6 +1434,7 @@ ggplot(casualties_df, aes(x = "", y = Freq, fill = factor(Var1))) +
   ggtitle("Distribution of Firefighter Casualties") +
   scale_fill_manual(values = c("pink", "lightblue", "lightgreen", "orange")) +
   labs(fill = "Casualties")
+
 #table
 #table(fire_data$tfs_firefighter_casualties)
 ```
@@ -1400,5 +1442,9 @@ ggplot(casualties_df, aes(x = "", y = Freq, fill = factor(Var1))) +
 15. **Response Time**: This is created variable. It is calculated as the difference between the `TFS_Alarm_Time` (when the fire service is notified of the incident) and the `TFS_Arrival_Time`. (See @fig-response-time-distribution)
 
 \newpage
+
+# Idealized Survey Methodology and Data Collection for Fire Severity Study in Toronto
+This study investigates the severity of fire incidents in Toronto to enhance resource allocation and optimize the effectiveness of the Toronto Fire Services (TFS). I work to understand key factors contributing to fire severity, including fire origin areas and ignition sources. I will also explore the effectiveness of public fire response systems, such as fire alarms sprinkler, smoke detection systems, to see how see thier presenace when fire incidence came and their effectiveness on reducsing fire. The methodology focuses on using observational data from fire incident records, public reports, and survey, and with statistical modeling to identify critical patterns and guide recommendations for TFS operations with understaingd of current fire infratcure presense.
+
 
 # References
