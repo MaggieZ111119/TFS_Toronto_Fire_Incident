@@ -4,7 +4,7 @@ subtitle: "Identifying Key Factors for Fire Severity and Evaluating the Effectiv
 author: 
   - Maggie Zhang
 thanks: "Code and data are available at: [https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident](https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident)."
-date: "December 3, 2024"
+date: today
 date-format: long
 abstract: "This study investigates fire severity levels in Toronto to improve resource allocation for Toronto Fire Services (TFS). The analysis identifies that higher-severity incidents are strongly correlated with incidents originating from mechanical, HVAC, and electrical areas, while cooking and lighting areas tend to lead to lower severity fires. The study also finds that fire incidents involving certain ignition sources, such as electrical units or lightning equipment, are more likely to be severe. The study also evaluates the effectiveness of public fire response systems, highlighting that fire alarms are successful in low and medium-severity fires, while sprinkler systems are often only partially operational. Results can guide TFS to enhance response times, prioritize resources, and optimize fire response operations, ultimately improving community safety in Toronto."
 format: pdf
@@ -43,7 +43,7 @@ Additionally, beyond investigating potential predictors of severe fire incidents
 
 The Office of the Fire Marshal (OFM) plays a crucial role in overseeing fire safety regulations in Ontario, ensuring fire protection, prevention, and public safety across the province. They are responsible for setting safety standards and improving public safety for all municipalities. Under the leadership of the OFM, municipal fire departments, such as Toronto Fire Services (TFS), allocate resources and develop plans to protect shared communities [@ontario_fire_marshal]. Therefore, by analyzing data within their standards, identifying factors that contribute to high-risk fire incidents, and evaluating current operational mechanisms, TFS can gain valuable insights to develop strategic response protocols that prioritize these incidents. This knowledge will help both the public and fire departments enhance response times, allocate resources more effectively, and reduce the occurrence of lower-severity incidents.
 
-The remainder of this paper is structured as follows. [@sec-data] describes the data used in the analysis, including the sources and key variables and their visualizations.[@sec-model] outlines the models applied to estimate fire severity and identify key factors. [@sec-results] presents the results of the analysis. [@sec-discussion] provides an interpretation of the results in the context of current fire safety practices and suggests potential improvements. Finally, [@sec-appendix] includes supplementary information and additional data details.
+The remainder of this paper is structured as follows. [@sec-data] describes the data used in the analysis, including the sources and key variables and their visualizations.[@sec-model] outlines the models applied to estimate fire severity and identify key factors. [@sec-results] presents the results of the analysis. [@sec-discussion] provides an interpretation of the results in the context of current fire safety practices and suggests potential improvements. Finally, [@sec-appendixa] includes details about variable selection and cleaning, with the visualization of all variables in the analysis dataset; [@sec-appendixb] is a supplementary datasheet that explains the building of the analysis dataset; [@sec-appendixc] outlines the idealized methodology for conducting this study, given a budget of $100K.
 
 In this paper, I used several R packages for data analysis and visualization. The `tidyverse`[@wickham2023tidyverse], `dplyr`[@wickham2023dplyr], and `tidyr`[@wickham2023tidyr] were used for data manipulation. `ggplot2`[@wickham2016ggplot2] facilitated data visualization, while `lubridate`[@grolemund2011lubridate] was used for date-time handling. `knitr`[@xie2023knitr] helped integrate code into reports. For modeling, I used `rstanarm`[@gelman2020rstanarm] and `modelsummary`[@fox2021modelsummary] for summaries, `caret`[@kuhn2023caret] for model training, and `xgboost`[@chen2016xgboost] for boosting. Additional tools like `rpart`[@therneau2015rpart], `fitdistrplus`[@delignette-muller2023fitdistrplus], and `pROC`[@robin2023pROC] supported partitioning, distribution fitting, and model evaluation.
 
@@ -98,7 +98,7 @@ The dataset is clearly structured, with the first column as ‘\_id,’ which is
 
 4.  **Safety Infrastructure**: This category includes data related to the status of existing infrastructure during the fire incident. It helps us understand the current system and supports decision-making for future improvements. Variables include: presence of fire alarm systems, sprinkler systems, and their operational status.
 
-This structured approach allows us to analyze and understand various aspects of fire incidents in Toronto. All variables in the dataset have the potential to provide valuable insights and perspectives for various analyses, contributing to fire prevention and safety improvements. However, for my analysis of fire incidents across Toronto, certain variables; such as latitude and longitude, incident numbers in the CAD system, Incident_Ward, and road intersections—are being excluded from the study. A more detailed explanation will be provided in the @sec-appendix.
+This structured approach allows us to analyze and understand various aspects of fire incidents in Toronto. All variables in the dataset have the potential to provide valuable insights and perspectives for various analyses, contributing to fire prevention and safety improvements. However, for my analysis of fire incidents across Toronto, certain variables; such as latitude and longitude, incident numbers in the CAD system, Incident_Ward, and road intersections—are being excluded from the study. A more detailed explanation will be provided in the @sec-appendixa.
 
 I have selected 17 variables to begin my exploration of the dataset:
 
@@ -172,7 +172,7 @@ ggplot(fire_data, aes(x = response_time)) +
 ## Data Explore
 
 **Understanding Variables of Interest**:\
-To understand the distribution of various categorical and numerical variables in the fire incident dataset, I visualized each variable along with its distribution and reviewed its summary statistics. The goal is to gain insights into the key characteristics of the data, which will support the later stages of analysis and modeling. Can check @sec-appendix for visualization/summary of the distribution of all variables. Below are a few important variables considered:
+To understand the distribution of various categorical and numerical variables in the fire incident dataset, I visualized each variable along with its distribution and reviewed its summary statistics. The goal is to gain insights into the key characteristics of the data, which will support the later stages of analysis and modeling. Can check @sec-appendixa for visualization/summary of the distribution of all variables. Below are a few important variables considered:
 
 1.  **Area of Origin**:\
     This is a categorical variable that indicates the location within a building or structure where a fire started. Initially, this variable had over 100 categories, so the goal was to categorize these locations into broader groups for easier interpretation and analysis. I grouped the areas into categories such as "Residential and Living Spaces," "Cooking and Dining Areas," and "Storage and Utility Areas," among others. These groups were then visualized to better understand the most common fire origins within the dataset (see @fig-area-origin-distribution). Among all categories, Cooking and Dinning area stands out to be the area which most fire originate from. Living space and Transportation area also has a great amount to incidence occurred.
@@ -324,7 +324,7 @@ ggplot(fire_data, aes(x = area_of_origin_grouped)) +
 ```
 
 2.  **Civilian Casualties**:\
-    This is a numerical variable that provides insight into the severity of the incidents. Basic descriptive statistics (e.g., mean, median, and range) were calculated using the `summary()` function. Additionally, a scatter plot was created to explore the relationship between the number of civilian casualties and the incident ID (see @tbl-civilian-casualties-summary). We can see that most of the time, there are no casualties. This data set ranges across over 10 years (see @fig-fire-incidents-by-year in @sec-appendix), looking at all levels of casualties, and taking its average over 6 years, we can see that this indicates the city has done a good job in protecting civilians from fire places.
+    This is a numerical variable that provides insight into the severity of the incidents. Basic descriptive statistics (e.g., mean, median, and range) were calculated using the `summary()` function. Additionally, a scatter plot was created to explore the relationship between the number of civilian casualties and the incident ID (see @tbl-civilian-casualties-summary). We can see that most of the time, there are no casualties. This data set ranges across over 10 years (see @fig-fire-incidents-by-year in @sec-appendixa), looking at all levels of casualties, and taking its average over 6 years, we can see that this indicates the city has done a good job in protecting civilians from fire places.
 
 ```{r}
 #| label: tbl-civilian-casualties-summary
@@ -1116,7 +1116,7 @@ ggplot(fire_data_filtered, aes(x = ignition_source_grouped, fill = ignition_sour
 
 # Appendix {.unnumbered}
 
-# Variable Selection and Visualization
+# Variable Selection and Visualization {#sec-appendixa}
 
 ```{r}
 #| inlcude: false
@@ -1442,7 +1442,13 @@ ggplot(casualties_df, aes(x = "", y = Freq, fill = factor(Var1))) +
 
 15. **Response Time**: This is created variable. It is calculated as the difference between the `TFS_Alarm_Time` (when the fire service is notified of the incident) and the `TFS_Arrival_Time`. (See @fig-response-time-distribution)
 
-# Idealized Research Methodology
+# Supplemental Datasheet {#sec-appendixb}
+
+A datasheet for the dataset used in this analysis is included with this paper. Please
+refer to this link to the [Datasheet](https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident/blob/main/paper/datasheet.pdf). 
+
+
+# Idealized Research Methodology {#sec-appendixc}
 
 ## Methodology Overview
 
