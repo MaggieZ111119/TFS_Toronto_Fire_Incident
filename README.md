@@ -16,7 +16,7 @@ The repo is structured as:
 -   `data/01-raw_data` contains the raw data as obtained from Open Data Toronto: Fire Incidents: https://open.toronto.ca/dataset/fire-incidents/
 -   `data/02-analysis_data` contains the cleaned dataset that was constructed, and also a dataset created for analysis in EDA Process.
 -   `model` contains fitted models. 
--   `other` contains details about LLM chat interactions and sketches of the data planning.
+-   `other` contains details about LLM chat interactions and sketches of the data planning.  It also contains a copy of the planned.
 -   `paper` contains the files used to generate the paper, including the Quarto document and reference bibliography file, as well as the PDF of the paper. It also contains a datasheet for the analysis dataset.
 -   `scripts` contains the R scripts used to simulate, download and clean data. Also included scripts used for model and result study.
 
