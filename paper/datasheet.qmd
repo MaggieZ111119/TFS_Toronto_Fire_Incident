@@ -4,7 +4,7 @@ subtitle: "Supplementary document to the paper \"Investigating Fire Incidents Se
 author: "Maggie Zhang"
 thanks: "Code and data are available at: [https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident](https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident); Original fire incidents dataset can be accessed from: [https://open.toronto.ca/dataset/fire-incidents/](https://open.toronto.ca/dataset/fire-incidents/)."
 date: today
-abstract: "This supplementary file accompanies the paper, \"Investigating Fire Incidents Severity Levels in Toronto: Enhancing Resource Allocation for Fire Response\". Following the structure outlined by [@gebru2021datasheets], this datasheet describes the motivation, composition, collection process, preprocessing/cleaning/labeling, uses, distribution, and maintenance of the cleaned analysis dataset. The dataset is available in the Repository: [TFS_Toronto_Fire_Incident_data_folder](https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident), under data folder, named: tfs_analysis_data. The original data was sourced from the Open Data Toronto portal [@OpenDataToronto] and is titled Fire Incidents [@FireIncidents]."
+abstract: "This supplementary file accompanies the paper, \"Investigating Fire Incidents Severity Levels in Toronto: Enhancing Resource Allocation for Fire Response\". Following the structure outlined by [@gebru2021datasheets], this datasheet describes the motivation, composition, collection process, preprocessing/cleaning/labeling, uses, distribution, and maintenance of the cleaned analysis dataset. The dataset is available in the Repository: [TFS_Toronto_Fire_Incident_data_folder](https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident), under data folder, named: tfs_analysis_data. The original data was sourced from the Open Data Toronto portal [@OpenDataToronto] and is titled Fire Incidents [@TFSfireedata]."
 format: pdf
 number-sections: true
 toc: true
@@ -12,7 +12,7 @@ bibliography: references.bib
 ---
 
 # Acknowledgement
-The original dataset, titled Fire Incidents [@FireIncidents], was obtained from the Open Data Toronto portal [@OpenDataToronto]. Maggie Zhang conducted the cleaning, analysis, and presentation as part of the Toronto Fire Incident Analysis Project. The processed dataset and related materials can be found in the repository [TFS_Toronto_Fire_Incident](https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident). 
+The original dataset, titled Fire Incidents [@TFSfireedata], was obtained from the Open Data Toronto portal [@OpenDataToronto]. Maggie Zhang conducted the cleaning, analysis, and presentation as part of the Toronto Fire Incident Analysis Project. The processed dataset and related materials can be found in the repository [TFS_Toronto_Fire_Incident](https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident). 
 This datasheet follows the structure outlined by [@gebru2021datasheets], with the questions in this document derived from their published paper.
 
 # Motivation
@@ -37,13 +37,13 @@ This datasheet follows the structure outlined by [@gebru2021datasheets], with th
    - The analysis dataset contains 14,623 unique fire incidents.
 
 3. **Dataset Type**: *Does the dataset contain all possible instances or is it a sample (not necessarily random) of instances from a larger set? If the dataset is a sample, then what is the larger set? Is the sample representative of the larger set (for example, geographic coverage)? If so, please describe how this representativeness was validated/verified. If it is not representative of the larger set, please describe why not (for example, to cover a more diverse range of instances, because instances were withheld or unavailable).*
-   - The dataset can be considered complete with respect to the reported fire incidents during the collection period from 2011 to 2023, aside from some incidents removed for privacy protection purposes [@FireIncidents]. Therefore, it is representative of the larger population of fire incidents.
+   - The dataset can be considered complete with respect to the reported fire incidents during the collection period from 2011 to 2023, aside from some incidents removed for privacy protection purposes [@TFSfireedata]. Therefore, it is representative of the larger population of fire incidents.
   - Personal data have been removed, and exact addresses are aggregated, following the Municipal Freedom of Information and Protection of Privacy Act (MFIPPA).
   - There are incidents that are still under investigation, thus some data points are missing (NAs).
 
 4. **Features**: *What data does each instance consist of? "Raw" data (for example, unprocessed text or images) or features? In either case, please provide a description.*
    - The raw dataset consists of 32,929 rows and 43 columns of variables, providing information on fire incidents responded to by Toronto Fire Services (TFS).
-   - In the cleaned analysis dataset for this study, there are 14,623 rows and 15 features. Each feature's name and description are listed below, extracted from the Fire Incident Data Portal [@FireIncidents].
+   - In the cleaned analysis dataset for this study, there are 14,623 rows and 15 features. Each feature's name and description are listed below, extracted from the Fire Incident Data Portal [@TFSfireedata].
    - id	: Unique row identifier for Open Data database
    - Area_of_Origin: OFM Area of Origin code and description
    - Civilian_Casualties: Count of civilian casualties. A causality can be a fire related injury or fire related fatality.
@@ -193,7 +193,7 @@ This datasheet follows the structure outlined by [@gebru2021datasheets], with th
 
 2. **Contact Information**: *How can the owner/curator/manager of the dataset be contacted (for example, email address)?*
    - To contact Maggie, email: maggie.zhang@mail.utoronto.ca.
-   - To access the original dataset, visit the Open Data Toronto Portal: [@FireIncidents]. 
+   - To access the original dataset, visit the Open Data Toronto Portal: [@TFSfireedata]. 
 
 3. **Erratum**: *Is there an erratum? If so, please provide a link or other access point.*
 	 - No. 
@@ -204,7 +204,7 @@ This datasheet follows the structure outlined by [@gebru2021datasheets], with th
 
 5. **Collaborations**: *If others want to extend/augment/build on/contribute to the dataset, is there a mechanism for them to do so? If so, please provide a description. Will these contributions be validated/verified? If so, please describe how. If not, why not? Is there a process for communicating/distributing these contributions to dataset consumers? If so, please provide a description.*
    - Collaboration inquiries are welcome via email to Maggie. If they want to build on or contribute to the dataset, they can fork the public GitHub repository: [TFS_Toronto_Fire_Incident_data_folder](https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident)
-   - If they are interested in the dataset and would like to start from the original data, they can access it through the Open Data Toronto Portal at Fire Incident Data [@FireIncidents].
+   - If they are interested in the dataset and would like to start from the original data, they can access it through the Open Data Toronto Portal at Fire Incident Data [@TFSfireedata].
 
 6. *Any other comments?*
 	- None. 
