@@ -2,7 +2,7 @@
 title: "Datasheet for the Toronto Fire Incidents Analysis Dataset"
 subtitle: "Supplementary document to the paper \"Investigating Fire Incidents Severity Levels in Toronto: Enhancing Resource Allocation for Fire Response\""
 author: "Maggie Zhang"
-thanks: "Code and data are available at: [https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident](https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident)."
+thanks: "Code and data are available at: [https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident](https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident); Original fire incidents dataset can be accessed from: [https://open.toronto.ca/dataset/fire-incidents/](https://open.toronto.ca/dataset/fire-incidents/)."
 date: today
 abstract: "This supplementary file accompanies the paper, \"Investigating Fire Incidents Severity Levels in Toronto: Enhancing Resource Allocation for Fire Response\". Following the structure outlined by [@gebru2021datasheets], this datasheet describes the motivation, composition, collection process, preprocessing/cleaning/labeling, uses, distribution, and maintenance of the cleaned analysis dataset. The dataset is available in the Repository: [TFS_Toronto_Fire_Incident_data_folder](https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident), under data folder, named: tfs_analysis_data. The original data was sourced from the Open Data Toronto portal [@OpenDataToronto] and is titled Fire Incidents [@FireIncidents]."
 format: pdf
