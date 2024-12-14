@@ -6,7 +6,7 @@ author:
 thanks: "Code and data are available at: [https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident](https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident)."
 date: today
 date-format: long
-abstract: "This study investigates fire severity levels in Toronto to improve resource allocation for Toronto Fire Services (TFS). The analysis identifies that higher-severity incidents are strongly correlated with incidents originating from mechanical, HVAC, and electrical areas, while cooking and lighting areas tend to lead to lower severity fires. The study also finds that fire incidents involving certain ignition sources, such as electrical units or lightning equipment, are more likely to be severe. The study also evaluates the effectiveness of public fire response systems, highlighting that fire alarms are successful in low and medium-severity fires, while sprinkler systems are often only partially operational. Results can guide TFS to enhance response times, prioritize resources, and optimize fire response operations, ultimately improving community safety in Toronto."
+abstract: "This study investigates fire severity levels in Toronto to improve resource allocation for Toronto Fire Services (TFS). The analysis identifies that higher-severity incidents are strongly correlated with fires originating in mechanical, HVAC, and electrical areas, while cooking and lighting areas tend to lead to lower severity fires. The study also finds that fire incidents involving certain ignition sources, such as electrical units or lightning equipment,  are more likely to cause severe fires. The study also evaluates the effectiveness of public fire response systems, highlighting that fire alarms are effective in low and medium-severity fires, while sprinkler systems are often only partially operational. Results can guide TFS to enhance response times, prioritize resources, and optimize fire response operations, ultimately improving community safety in Toronto."
 format: pdf
 number-sections: true
 toc: true
@@ -51,20 +51,21 @@ In this paper, I used several R packages for data analysis and visualization. Th
 
 ## Overview
 
-We use the statistical programming language R [@citeR]to investigate data about fire incidents, downloaded from the Open Data Toronto Portal [@OpenDataToronto], named [Fire Incidents](https://open.toronto.ca/dataset/fire-incidents/) [@TFSfireedata]. The dataset was last updated on December 31, 2023. It includes fire incidents following the Ontario Fire Marshal's (OFM) definition, with descriptions according to OFM standards. The dataset also provides detailed information on Toronto Fire Services' (TFS) responses to each fire incident. The data is mostly complete, though some incidents are still under investigation and categorized as "no loss outdoor fire." The dataset includes information on the origin of fires, impacts on civilians and buildings, as well as geographical data (see @tbl-preview-data). Additionally, it contains details on TFS response times and actions taken. Overall, the dataset is comprehensive, informative, and provides valuable insights for my later study.
+I use the statistical programming language R [@citeR]to investigate data about fire incidents, downloaded from the Open Data Toronto Portal [@OpenDataToronto], named [Fire Incidents](https://open.toronto.ca/dataset/fire-incidents/) [@TFSfireedata]. The dataset was last updated on December 31, 2023. It includes fire incidents following the Ontario Fire Marshal's (OFM) definition, with descriptions according to OFM standards. The dataset also provides detailed information on Toronto Fire Services' (TFS) responses to each fire incident. The data is mostly complete, though some incidents are still under investigation. Feature includes specification on the origin of fires, impacts on civilians and buildings, as well as geographical data (see @tbl-preview-data). Additionally, it contains details on TFS response times and actions taken. Overall, the dataset is comprehensive, informative, and provides valuable insights for my later study.
 
 ```{r}
 #| label: tbl-preview-data
-#| tbl-cap: Preview of the Fire Incident data (https://open.toronto.ca/dataset/fire-incidents/) before cleaning, displaying the first six rows with columns decided first in interested for study.
+#| tbl-cap: Preview of the Fire Incident data (https://open.toronto.ca/dataset/fire-incidents/) before cleaning, displaying the first four incidents with columns decided first in interested for study.
 #| echo: false
 #| warning: false
+
 
 library(tidyverse)
 library(dplyr)
 library(lubridate)
 library(kableExtra)
 
-#### Load original data ####
+## Load original data ##
 raw_data <- read_csv(file = here::here("data/01-raw_data/raw_fire_data.csv"))
 
 columns_to_keep <- c("_id", "Area_of_Origin", "Building_Status", "Business_Impact", 
@@ -79,10 +80,13 @@ clean_data <- raw_data[, columns_to_keep]
 # Change columns name to lower case and ensure no space
 colnames(clean_data) <- tolower(gsub(" ", "_", colnames(clean_data)))
 
-### Preview data ###
+## Preview data ##
 head_table <- head(clean_data)
-kable(head(head_table)) |>
-  kable_styling(latex_options = c("scale_down"))
+kable(t((clean_data)[1:4,])) |>
+  kable_styling(latex_options = c("scale_down"), font_size = 7) |>
+  column_spec(1, width = "3.5cm") |>
+  column_spec(c(2, 3, 4, 5), width = "3cm")
+
 
 ```
 
@@ -855,7 +859,7 @@ Therefore, `area_of_origin` is indeed a significant predictor of fire severity, 
 
 ## Fire infrastructure
 
-There is no doubt that infrastructure such as fire alarm and sprinkler systems play a crucial role in controlling fire severity. The presence of these systems will reduces the risk and impact of fires. However, the key question remains: how well do these fire safety infrastructures perform in real fire incidents? We come across result of question by looking at the result we get from analyzing the data set. In this analysis, I processed the data and visualized the distribution of fire alarm system operations and sprinkler system presence across different levels of fire severity (Low, Medium, High). These visualizations provide valuable insights into how the presence of these systems correlates with the severity of fire incidents.
+There is no doubt that infrastructure such as fire alarm and sprinkler systems play a crucial role in controlling fire severity. The presence of these systems will reduces the risk and impact of fires. However, the key question remains: how well do these fire safety infrastructures perform in real fire incidents? I come across result of question by looking at the result get from analyzing the data set. In this analysis, I processed the data and visualized the distribution of fire alarm system operations and sprinkler system presence across different levels of fire severity (Low, Medium, High). These visualizations provide valuable insights into how the presence of these systems correlates with the severity of fire incidents.
 
 ### Fire Alarm System Status
 
@@ -867,7 +871,7 @@ The results shown from the exploration of the proportion of fire alarm system st
 #| warning: false
 #| message: false
 #| label: fig-firealarmsystem-proportion
-#| fig-cap: This shows a proportional distribution of fire alarm system operation status across different fire severity levels (Low, Medium, High). This stacked bar plot shows the relative frequencies of various fire alarm system operations within each severity group. We noctice that fire alarm was not always operated in high severity incidents, but not active in low severity fire.
+#| fig-cap: This shows a proportional distribution of fire alarm system operation status across different fire severity levels (Low, Medium, High). This stacked bar plot shows the relative frequencies of various fire alarm system operations within each severity group. Can noctice that fire alarm was not always operated in high severity incidents, but not active in low severity fire.
 
 library(tidyverse)
 library(rstanarm)
