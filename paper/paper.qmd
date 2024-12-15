@@ -1,12 +1,12 @@
 ---
 title: "Investigating Fire Incidents Severity Levels in Toronto: Enhancing Resource Allocation for Fire Response"
-subtitle: "Identifying Key Factors for Fire Severity and Evaluating the Effectiveness of Public Fire Response Systems"
+subtitle: "Key Role of Origin of Fire and Opportunities to Improve the Effectiveness of Toronto's Public Fire Infrastructure"
 author: 
   - Maggie Zhang
-thanks: "Code and data are available at: [https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident](https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident)."
+thanks: "Code and data supporting this analysis are available at: [https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident](https://github.com/MaggieZ111119/TFS_Toronto_Fire_Incident)."
 date: today
 date-format: long
-abstract: "This study investigates fire severity levels in Toronto to improve resource allocation for Toronto Fire Services (TFS). The analysis identifies that higher-severity incidents are strongly correlated with fires originating in mechanical, HVAC, and electrical areas, while cooking and lighting areas tend to lead to lower severity fires. The study also finds that fire incidents involving certain ignition sources, such as electrical units or lightning equipment,  are more likely to cause severe fires. The study also evaluates the effectiveness of public fire response systems, highlighting that fire alarms are effective in low and medium-severity fires, while sprinkler systems are often only partially operational. Results can guide TFS to enhance response times, prioritize resources, and optimize fire response operations, ultimately improving community safety in Toronto."
+abstract: "This study investigates fire severity levels in Toronto to improve resource allocation for Toronto Fire Services (TFS). The analysis identifies that higher-severity incidents are strongly correlated with fires originating in mechanical, HVAC, and electrical areas, while cooking and lighting areas tend to lead to more frequent but lower-severity fires.It also finds that fire incidents involving certain ignition sources, such as electrical units or lightning equipment, are more likely to cause severe fires. Additionally, the study evaluates the effectiveness of public fire response systems, highlighting that fire alarms are effective in low and medium-severity fires, while sprinkler systems are often only partially operational. These findings can assist TFS in enhancing response strategies, prioritizing resources, and optimizing fire response operations, ultimately improving community safety in Toronto."
 format: pdf
 number-sections: true
 toc: true
@@ -33,25 +33,25 @@ fire_data <- read_parquet(file = here::here("data/02-analysis_data/tfs_analysis_
 
 # Introduction
 
-The study aims to estimate the severity of fires in the Toronto region. A fire incident, as defined by the Ontario Fire Marshal (OFM), refers to any event involving fire, explosion, or other situations suspected to lead to significant outcomes, such as injury or death [@ontario_fire_marshal].
+The study aims to estimate the severity of fires in the Toronto city A fire incident, as defined by the Ontario Fire Marshal (OFM), refers to any event involving fire, explosion, or other situations suspected to lead to significant outcomes, such as injury or death [@ontario_fire_marshal].
 
-The severity of a fire can be assessed through various factors, including the intensity of the flames, the size of the affected area, the duration of the fire, its impact on human activities, and its potential threat to animal habitats. There are numerous standards and considerations when discussing fire severity, but when it comes to prediction, it is unrealistic to consider all factors. Therefore, defining severity becomes the first task before any further analysis. In this paper, the severity of a fire is defined based on three aspects: casualty and financial loss, the type of incident, and the number of apparatuses dispatched by Toronto Fire Services (TFS) in response to the fire. Further explanation of how severity is defined will be provided later in the paper.
+The severity of a fire can be assessed through various factors, including the intensity of the flames, the size of the affected area, its impact on human activities, and its potential threat to animal habitats. There are numerous standards and considerations when discussing fire severity, but when it comes to prediction, it is unrealistic to consider all factors. Therefore, defining severity becomes the first task before any further analysis. In this study, the severity of a fire is defined based on three aspects: casualty and financial loss, the type of incident, and the number of apparatuses dispatched by Toronto Fire Services (TFS) in response to the fire. Further explanation of how severity is defined will be provided later in the paper.
 
-This research also identifies specific high-priority response criteria that can enhance TFS operations. By examining the data, it has been found that the area of origin of a fire is a significant predictor of fire severity. Fires originating from mechanical, HVAC, and electrical areas are highly correlated with severe incidents, whereas fires originating from cooking and heating areas are more commonly associated with low-severity incidents.
+This study also identifies high-priority response criteria that can assist in enhancing TFS' future operations. By examining the data, it has been found that the area of origin of a fire is a significant predictor of fire severity. Fires originating from mechanical, HVAC, and electrical areas are highly correlated with severe incidents, whereas fires originating from cooking and heating areas are more commonly associated with low-severity incidents though they are more frequent.
 
-Additionally, beyond investigating potential predictors of severe fire incidents, this study also explores the effectiveness of current public fire response mechanisms, such as fire alarms and sprinkler systems, in the Toronto region. It was discovered that sprinkler systems, across all levels of fire severity, were largely only partially operational. On the other hand, fire alarm systems were successfully activated in low and medium-severity fire incidents.
+Additionally, this study explores the effectiveness of current public fire response mechanisms in Toronto, such as fire alarms and sprinkler systems. It was found that sprinkler systems, across all levels of fire severity, were mostly only partially operational. Fire alarm systems were successfully activated in low and medium-severity fire incidents but there is room for improvement in higher-severity incidents.
 
-The Office of the Fire Marshal (OFM) plays a crucial role in overseeing fire safety regulations in Ontario, ensuring fire protection, prevention, and public safety across the province. They are responsible for setting safety standards and improving public safety for all municipalities. Under the leadership of the OFM, municipal fire departments, such as Toronto Fire Services (TFS), allocate resources and develop plans to protect shared communities [@ontario_fire_marshal]. Therefore, by analyzing data within their standards, identifying factors that contribute to high-risk fire incidents, and evaluating current operational mechanisms, TFS can gain valuable insights to develop strategic response protocols that prioritize these incidents. This knowledge will help both the public and fire departments enhance response times, allocate resources more effectively, and reduce the occurrence of lower-severity incidents.
+The Office of the Fire Marshal (OFM) plays a crucial role in overseeing fire safety regulations in Ontario, ensuring fire protection, prevention, and public safety across the province. It is responsible for setting safety standards and improving public safety in all municipalities. Under the leadership of the OFM, municipal fire departments, such as Toronto Fire Services (TFS), allocate resources and develop plans to protect our communities [@ontario_fire_marshal]. Therefore, by analyzing data within their standards, identifying factors that contribute to high-risk fire incidents, and evaluating current operational mechanisms, TFS can gain valuable insights to develop strategic protocols that prioritize certain incidents. These findings will help both the public and fire departments enhance response to incidents, allocate resources more effectively, and reduce the occurrence of controllable incidents.
 
-The remainder of this paper is structured as follows. [@sec-data] describes the data used in the analysis, including the sources and key variables and their visualizations.[@sec-model] outlines the models applied to estimate fire severity and identify key factors. [@sec-results] presents the results of the analysis. [@sec-discussion] provides an interpretation of the results in the context of current fire safety practices and suggests potential improvements. Finally, [@sec-appendixa] includes details about variable selection and cleaning, with the visualization of all variables in the analysis dataset; [@sec-appendixb] is a supplementary datasheet that explains the building of the analysis dataset; [@sec-appendixc] outlines the idealized methodology for conducting this study, given a budget of $100K.
+The remainder of this paper is structured as follows. Data [@sec-data] describes the data used in the analysis, including the sources and key variables along with their visualizations. Model [@sec-model] outlines the models applied to estimate fire severity and identify key factors. Result [@sec-results] presents the analysis results with supporting graphs and tables. Discussion [@sec-discussion] provides interpretations of the results in the context of current fire safety practices and suggests future improvements. Finally, Appendix [@sec-appendixa] includes details about variable selection criterion and data cleaning, with the visualization of all variables in the analysis dataset; Appendix [@sec-appendixb] is a supplementary datasheet that explains the building of the analysis dataset; Appendix [@sec-appendixc] outlines my idealized methodology for conducting this study, given a budget of $100K.
 
-In this paper, I used several R packages for data analysis and visualization. The `tidyverse`[@wickham2023tidyverse], `dplyr`[@wickham2023dplyr], and `tidyr`[@wickham2023tidyr] were used for data manipulation. `ggplot2`[@wickham2016ggplot2] facilitated data visualization, while `lubridate`[@grolemund2011lubridate] was used for date-time handling. `knitr`[@xie2023knitr] helped integrate code into reports. For modeling, I used `rstanarm`[@gelman2020rstanarm] and `modelsummary`[@fox2021modelsummary] for summaries, `caret`[@kuhn2023caret] for model training, and `xgboost`[@chen2016xgboost] for boosting. Additional tools like `rpart`[@therneau2015rpart], `fitdistrplus`[@delignette-muller2023fitdistrplus], and `pROC`[@robin2023pROC] supported partitioning, distribution fitting, and model evaluation.
+In this paper, analyzing with R (@citeR), I used several packages throughout the analysis.  The `tidyverse`[@wickham2023tidyverse], `dplyr`[@wickham2023dplyr], and `tidyr`[@wickham2023tidyr] were used for data manipulation. `ggplot2`[@wickham2016ggplot2] facilitated data visualization, while `lubridate`[@grolemund2011lubridate] was used for date-time handling. `knitr`[@xie2023knitr] helped integrate code into reports. For modeling, I used `rstanarm`[@gelman2020rstanarm] and `modelsummary`[@fox2021modelsummary] for summaries, `caret`[@kuhn2023caret] for model training, and `xgboost`[@chen2016xgboost] for boosting. Additional tools like `rpart`[@therneau2015rpart], `fitdistrplus`[@delignette-muller2023fitdistrplus], and `pROC`[@robin2023pROC] supported partitioning, distribution fitting, and model evaluation.
 
 # Data {#sec-data}
 
 ## Overview
 
-I use the statistical programming language R [@citeR]to investigate data about fire incidents, downloaded from the Open Data Toronto Portal [@OpenDataToronto], named [Fire Incidents](https://open.toronto.ca/dataset/fire-incidents/) [@TFSfireedata]. The dataset was last updated on December 31, 2023. It includes fire incidents following the Ontario Fire Marshal's (OFM) definition, with descriptions according to OFM standards. The dataset also provides detailed information on Toronto Fire Services' (TFS) responses to each fire incident. The data is mostly complete, though some incidents are still under investigation. Feature includes specification on the origin of fires, impacts on civilians and buildings, as well as geographical data (see @tbl-preview-data). Additionally, it contains details on TFS response times and actions taken. Overall, the dataset is comprehensive, informative, and provides valuable insights for my later study.
+I use the statistical programming language R [@citeR]to investigate data about fire incidents, downloaded from the Open Data Toronto Portal [@OpenDataToronto], named [Fire Incidents](https://open.toronto.ca/dataset/fire-incidents/) [@TFSfireedata]. The dataset was last updated on December 31, 2023. It includes fire incidents following the Ontario Fire Marshal's (OFM) definition, with descriptions according to OFM standards. The dataset also provides detailed information on Toronto Fire Services (TFS) responses to each fire incident. The data is mostly complete, though some incidents are still under investigation. Feature includes specification on the origin of fires, impacts on civilians and buildings, as well as geographical data (see @tbl-preview-data). Additionally, it contains details on TFS response times and actions taken. Overall, the dataset is comprehensive, informative, and provides valuable insights for my later study.
 
 ```{r}
 #| label: tbl-preview-data
@@ -92,65 +92,82 @@ kable(t((clean_data)[1:4,])) |>
 
 ## Measurement
 
-The dataset is clearly structured, with the first column as ‘\_id,’ which is a unique identifier for each record in the database. There are 43 columns in total, containing information ranging from Incident Type to Infrastructure. These columns can be mainly divided into four categories based on my understanding:
+The dataset is clearly structured, with the first column as ‘\_id,’ which is a unique identifier for each record in the database. There are 43 columns in total in the original set, containing information ranging from incident type to infrastructure's presence. These columns can be divided into four categories based on my understanding:
 
-1.  **Incident Type and Cause**: This category contains information directly related to each fire incident, including descriptive details about the incident, its nature, and origin. It covers aspects such as where the fire started, the materials involved, and potential causes. These variables are crucial for predicting fire behavior, and include columns like 'area of origin,' 'level of origin,' and 'smoke spread.'
+1.  **Incident Type and Cause**: This category provides information directly related to each fire incident, including descriptive details about the incident, its nature, and origin. It covers aspects such as where the fire started, the materials involved, and potential causes. These variables are crucial for predicting fire behavior, and include columns like 'area of origin,' 'level of origin,' and 'smoke spread.'
 
-2.  **Impact on Humans and the Economy**: These variables describe the direct outcomes of fire incidents, including financial and environmental impacts, as well as effects on human life. This category is key for defining the severity of fires. Variables include: firefighter casualties, civilian casualties, building status after the fire, and the number of displaced people.
+2.  **Impact on Humans and the Economy**: These variables describe the direct outcomes of fire incidents, including financial and environmental impacts, as well as effects on human life. This category is key for defining the severity of fires. Variables include firefighter casualties, civilian casualties, building status after the fire, and the number of displaced people.
 
 3.  **Response Evaluation**: This category records TFS's reactions to each reported fire incident. It provides valuable insight into the effectiveness of the current system and helps when predicting fire severity. Variables include: 'fire control time,' 'incident location,' 'number of responding personnel,' and 'TFS arrival times.'
 
-4.  **Safety Infrastructure**: This category includes data related to the status of existing infrastructure during the fire incident. It helps us understand the current system and supports decision-making for future improvements. Variables include: presence of fire alarm systems, sprinkler systems, and their operational status.
+4.  **Safety Infrastructure**: This category includes data related to the status of existing infrastructure during the fire incident. It helps us understand the current system and supports decision-making for future improvements. Variables include the presence of fire alarm systems, sprinkler systems, and their operational status.
 
-This structured approach allows us to analyze and understand various aspects of fire incidents in Toronto. All variables in the dataset have the potential to provide valuable insights and perspectives for various analyses, contributing to fire prevention and safety improvements. However, for my analysis of fire incidents across Toronto, certain variables; such as latitude and longitude, incident numbers in the CAD system, Incident_Ward, and road intersections—are being excluded from the study. A more detailed explanation will be provided in the @sec-appendixa.
+This dividing approach helps analyze and understand rounded aspects of fire incidents in Toronto. All variables in the dataset have the potential to provide valuable insights and perspectives for various analyses, contributing to fire prevention and safety improvements. However, for my focus on analyzing fire incidents across Toronto, certain variables, such as latitude and longitude, incident numbers in the CAD system, Incident_Ward, and road intersections—are being excluded from the study. A more detailed explanation will be provided in the @sec-appendixa.
 
-I have selected 17 variables to begin my exploration of the dataset:
+I selected 17 variables to begin my exploration of the dataset:
 
-1.  **\_id**: A unique identifier for each record, essential for distinguishing between incidents and for tracking and referencing.
+```{r}
+# This is only a table help to structure layout of paper formatting, no statistical analysis information involve, thus no caption
+#| label: tbl_variables_description
+#| echo: false
+#| warning: false
 
-2.  **Area_of_Origin**: Represents the fire’s origin location, useful for analyzing geographical patterns and fire causes.
+variable_table <- data.frame(
+  Variable = c(
+    "_id", 
+    "Area_of_Origin", 
+    "Building_Status", 
+    "Business_Impact", 
+    "Civilian_Casualties", 
+    "Estimated_Dollar_Loss", 
+    "Exposures", 
+    "Final_Incident_Type", 
+    "Fire_Alarm_System_Operation", 
+    "Ignition_Source", 
+    "Number_of_Responding_Appliances", 
+    "Number_of_Responding_Personnel", 
+    "Possible_Cause", 
+    "Sprinkler_System_Presence", 
+    "TFS_Alarm_Time", 
+    "TFS_Arrival_Time", 
+    "TFS_Firefighter_Casualties"
+  ),
+  Description = c(
+    "A unique identifier for each record, essential for distinguishing between incidents and for tracking and referencing.",
+    "Represents the fire’s origin location, useful for analyzing geographical patterns and fire causes.",
+    "Indicates whether the building was occupied, under construction, or vacant, providing insights into fire severity and response needs.",
+    "Classifies the economic impact of the fire on businesses, helping to understand disruptions and guide recovery efforts.",
+    "The count of civilian casualties, reflecting the human impact and assessing fire safety and evacuation effectiveness.",
+    "The monetary loss due to fire damage, key for assessing the economic burden and informing prevention efforts.",
+    "The number of secondary fires caused by the primary incident, useful for evaluating the fire's spread and containment success.",
+    "The final classification of the fire (e.g., accidental, arson), critical for identifying causes and informing preventive strategies.",
+    "Indicates whether the fire alarm system functioned properly, evaluating the system’s effectiveness in alerting and activating suppression.",
+    "The source of ignition (e.g., electrical faults, arson), crucial for identifying fire causes and guiding safety measures.",
+    "The number of fire trucks and equipment dispatched, reflecting the scale of the incident and resource allocation.",
+    "The number of fire personnel involved, providing insight into the severity of the fire and the required response intensity.",
+    "The potential cause of the fire, useful for identifying trends and informing fire prevention and safety campaigns.",
+    "Indicates if a sprinkler system was present, highlighting its impact on fire severity and potential casualties.",
+    "The time when the fire service was notified, key for analyzing response time and minimizing damage.",
+    "The time when the first fire service unit arrived, crucial for evaluating response speed and fire control effectiveness.",
+    "The number of firefighter casualties, useful for assessing the safety of firefighting operations and improving risk management."
+  )
+)
 
-3.  **Building_Status**: Indicates whether the building was occupied, under construction, or vacant, providing insights into fire severity and response needs.
+kable(variable_table) |> 
+  kable_styling(font_size = 6) |>
+  column_spec(2, width = "9cm") 
 
-4.  **Business_Impact**: Classifies the economic impact of the fire on businesses, helping to understand disruptions and guide recovery efforts.
-
-5.  **Civilian_Casualties**: The count of civilian casualties, reflecting the human impact and assessing fire safety and evacuation effectiveness.
-
-6.  **Estimated_Dollar_Loss**: The monetary loss due to fire damage, key for assessing the economic burden and informing prevention efforts.
-
-7.  **Exposures**: The number of secondary fires caused by the primary incident, useful for evaluating the fire's spread and containment success.
-
-8.  **Final_Incident_Type**: The final classification of the fire (e.g., accidental, arson), critical for identifying causes and informing preventive strategies.
-
-9.  **Fire_Alarm_System_Operation**: Indicates whether the fire alarm system functioned properly, evaluating the system’s effectiveness in alerting and activating suppression.
-
-10. **Ignition_Source**: The source of ignition (e.g., electrical faults, arson), crucial for identifying fire causes and guiding safety measures.
-
-11. **Number_of_Responding_Appliances**: The number of fire trucks and equipment dispatched, reflecting the scale of the incident and resource allocation.
-
-12. **Number_of_Responding_Personnel**: The number of fire personnel involved, providing insight into the severity of the fire and the required response intensity.
-
-13. **Possible_Cause**: The potential cause of the fire, useful for identifying trends and informing fire prevention and safety campaigns.
-
-14. **Sprinkler_System_Presence**: Indicates if a sprinkler system was present, highlighting its impact on fire severity and potential casualties.
-
-15. **TFS_Alarm_Time**: The time when the fire service was notified, key for analyzing response time and minimizing damage.
-
-16. **TFS_Arrival_Time**: The time when the first fire service unit arrived, crucial for evaluating response speed and fire control effectiveness.
-
-17. **TFS_Firefighter_Casualties**: The number of firefighter casualties, useful for assessing the safety of firefighting operations and improving risk management.
+```
 
 By focusing on these 17 variables, I aim to uncover meaningful patterns and insights that can support fire safety improvements across the city.
 
 ## Data Cleaning
 
-The raw dataset was stored in its original csv format to ensure data integrity and reproducibility, and later analysis data after cleaning and processing is saved into parquet file using `write_parquet` function in `arrow` package [@arrow2024].
+The raw dataset was stored in its original CSV format to ensure data integrity and reproducibility, and later analysis data after cleaning and processing was saved into a parquet file using the `write_parquet` function in the `arrow` package [@arrow2024]. After loading and cleaning the data, I retained only the relevant columns and renamed them for consistency. I removed rows with 'Undetermined' ignition sources, ensuring that the dataset focused on the relationship between ignition sources and fire severity following the study topic.
 
-After loading the original raw data, I selected the columns of interest as explained in the previous section. These columns were then renamed to lowercase, and spaces were replaced with underscores to ensure consistency. After reviewing the data, I kept in mind that this study focuses on the relationship between ignition sources and fire severity. As a result, I removed rows with "Undetermined" ignition sources.
+I converted time-related variables to the POSIX format. Moreover, I noticed the presence of quite an amount of missing values (NAs) and NULL values. Given that the dataset contains numerous categorical variables, I considered how to handle them differently for these types. I first examined whether any columns contained too little information to provide valuable insights into fire severity or its predictors. After calculating, I decided to remove columns with more than 20% missing data, carefully considering their relevance to the study.
 
-Since there are time-related variables in the dataset, I converted them to the POSIX format. Additionally, I noticed the presence of several missing (NA) and null values. Given that the dataset contains numerous categorical variables, I considered how to handle missing data differently for these types. I first examined whether any columns contained too little information to provide valuable insights into fire severity or its predictors. After calculating, I decided to remove columns with more than 20% missing data, carefully considering their relevance to the study.
-
-To maintain data quality, rows with more than 30% missing data are removed. After ensuring that there are no missing values in the dataset, a new variable, Response_Time, is created to calculate the time difference (in minutes) between TFS_Alarm_Time and TFS_Arrival_Time (see @fig-response-time-distribution). This new variable will help analyze fire response efficiency and is a key indicator for the study.
+To maintain data quality, rows with more than 30% missing data are removed. With complete data, a new variable named `Response_Time` is created to calculate the time difference (in minutes) between TFS_Alarm_Time and TFS_Arrival_Time (see @fig-response-time-distribution). This new variable will help analyze fire response efficiency and is a key indicator for the study. As shown in the plot, TFS response times center around 5 minutes, with less variation towards longer times.
 
 ```{r}
 #| label: fig-response-time-distribution
@@ -165,7 +182,6 @@ fire_data <- read_parquet(here::here("data/02-analysis_data/tfs_analysis_data.pa
 ggplot(fire_data, aes(x = response_time)) +
   geom_histogram(bins = 30, fill = "lightgreen", color = "black") +
   theme_minimal() +
-  ggtitle("Response Time Distribution") +
   xlab("Response Time (minutes)") +
   ylab("Frequency") +
   stat_bin(aes(label = ..count..), geom = "text", vjust = -0.5, size = 3) +
