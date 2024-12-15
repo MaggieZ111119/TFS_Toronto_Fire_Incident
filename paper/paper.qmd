@@ -102,16 +102,16 @@ The dataset is clearly structured, with the first column as ‘\_id,’ which is
 
 4.  **Safety Infrastructure**: This category includes data related to the status of existing infrastructure during the fire incident. It helps us understand the current system and supports decision-making for future improvements. Variables include the presence of fire alarm systems, sprinkler systems, and their operational status.
 
-This dividing approach helps analyze and understand rounded aspects of fire incidents in Toronto. All variables in the dataset have the potential to provide valuable insights and perspectives for various analyses, contributing to fire prevention and safety improvements. However, for my focus on analyzing fire incidents across Toronto, certain variables, such as latitude and longitude, incident numbers in the CAD system, Incident_Ward, and road intersections—are being excluded from the study. A more detailed explanation will be provided in the @sec-appendixa.
+This dividing approach helps analyze and understand rounded aspects of fire incidents in Toronto. All variables in the dataset have the potential to provide valuable insights and perspectives for various analyses, contributing to fire prevention and safety improvements. However, for my focus on analyzing fire incidents across Toronto, certain variables, such as latitude and longitude, incident numbers in the CAD system, Incident_Ward, and road intersections—are being excluded from the study. A more detailed explanation will be provided in the Appendix @sec-appendixa.
 
 I selected 17 variables to begin my exploration of the dataset:
 
 ```{r}
-# This is only a table help to structure layout of paper formatting, no statistical analysis information involve, thus no caption
 #| label: tbl_variables_description
 #| echo: false
 #| warning: false
 
+# This is only a table help to structure the layout of paper formatting, no statistical analysis information involve, thus no caption
 variable_table <- data.frame(
   Variable = c(
     "_id", 
@@ -154,7 +154,7 @@ variable_table <- data.frame(
 )
 
 kable(variable_table) |> 
-  kable_styling(font_size = 6) |>
+  kable_styling(font_size = 6.5) |>
   column_spec(2, width = "9cm") 
 
 ```
@@ -174,6 +174,9 @@ To maintain data quality, rows with more than 30% missing data are removed. With
 #| fig-cap: Distribution of response times for fire incidents in Toronto, showing the frequency of various response times (in minutes). This visualization highlights the efficiency of the Toronto Fire Service's (TFS) response. It's almost normally distributed with a mean of around 5, and the spread of not too far.
 #| echo: false
 #| warning: false
+#| fig.width: 5
+#| fig.height: 3
+
 library(ggplot2)
 library(arrow)
 fire_data <- read_parquet(here::here("data/02-analysis_data/tfs_analysis_data.parquet"))
@@ -192,10 +195,10 @@ ggplot(fire_data, aes(x = response_time)) +
 ## Data Explore
 
 **Understanding Variables of Interest**:\
-To understand the distribution of various categorical and numerical variables in the fire incident dataset, I visualized each variable along with its distribution and reviewed its summary statistics. The goal is to gain insights into the key characteristics of the data, which will support the later stages of analysis and modeling. Can check @sec-appendixa for visualization/summary of the distribution of all variables. Below are a few important variables considered:
+To understand the distribution of various categorical and numerical variables in the fire incident dataset, I analyzed each variable along with its distribution and reviewed its summary statistics. The goal is to gain insights into the key characteristics of the data, which will support the later stages of analysis and modelling. For a comprehensive overview of all chosen variables, including their visualizations and summaries, refer to Appendix @sec-appendixa. Below are a few important variables considered:
 
 1.  **Area of Origin**:\
-    This is a categorical variable that indicates the location within a building or structure where a fire started. Initially, this variable had over 100 categories, so the goal was to categorize these locations into broader groups for easier interpretation and analysis. I grouped the areas into categories such as "Residential and Living Spaces," "Cooking and Dining Areas," and "Storage and Utility Areas," among others. These groups were then visualized to better understand the most common fire origins within the dataset (see @fig-area-origin-distribution). Among all categories, Cooking and Dinning area stands out to be the area which most fire originate from. Living space and Transportation area also has a great amount to incidence occurred.
+    This is a categorical variable that indicates the location within a building or structure where a fire started. Initially, this variable had over 100 categories, so the goal was to categorize these locations into broader groups for easier interpretation and analysis. I grouped the areas into categories such as "Residential and Living Spaces," "Cooking and Dining Areas," and "Storage and Utility Areas," among others. These groups were then visualized to better understand the most common fire origins within the dataset (see @fig-area-origin-distribution). Among all categories, the Cooking and Dining area stands out to be the area which most fires originate from. Living space and Transportation areas also have a great amount of incidence occurred.
 
 ```{r}
 #| label: fig-area-origin-distribution
@@ -344,7 +347,7 @@ ggplot(fire_data, aes(x = area_of_origin_grouped)) +
 ```
 
 2.  **Civilian Casualties**:\
-    This is a numerical variable that provides insight into the severity of the incidents. Basic descriptive statistics (e.g., mean, median, and range) were calculated using the `summary()` function. Additionally, a scatter plot was created to explore the relationship between the number of civilian casualties and the incident ID (see @tbl-civilian-casualties-summary). We can see that most of the time, there are no casualties. This data set ranges across over 10 years (see @fig-fire-incidents-by-year in @sec-appendixa), looking at all levels of casualties, and taking its average over 6 years, we can see that this indicates the city has done a good job in protecting civilians from fire places.
+    This is a numerical variable that provides insight into the severity of the incidents. Basic descriptive statistics were calculated using the `summary()` function. Additionally, a scatter plot was created to explore the relationship between the number of civilian casualties and the incident ID (see @tbl-civilian-casualties-summary). We can see that most of the time, there are no casualties. This data set ranges across over 10 years (see @fig-fire-incidents-by-year in @sec-appendixa), looking at all levels of casualties, and taking its average over 6 years, we can see that this indicates the city has done a good job in protecting civilians from fireplaces.
 
 ```{r}
 #| label: tbl-civilian-casualties-summary
@@ -361,7 +364,7 @@ kable(civilian_casualties_df)
 ```
 
 3.  **Final Incident Type**:\
-    This is a categorical variable that classifies the type of incident (e.g., fire, explosion). A bar plot was created to visualize the distribution of different incident types.(see @fig-final-incident-type-distribution). It's clear that there are more fire than explotion.
+    This is a categorical variable that classifies the type of incident (e.g., fire, explosion). A bar plot was created to visualize the distribution of different incident types.(see @fig-final-incident-type-distribution). It's clear that there is more fire than explosion.
 
 ```{r}
 #| label: fig-final-incident-type-distribution
@@ -385,8 +388,8 @@ ggplot(fire_data, aes(x = final_incident_type)) +
 ```
 
 4.  **Ignition Source**:\
-    This variable provides information about the cause of the fire. Categories of ignition sources, such as "Incandescent Lamp" or "Vehicle - Mechanical," were listed. The distribution of ignition sources was visualized with a bar plot (see @fig-grouped-ignition-source-distribution). We can tell that fire-related and open flame is one of the biggest source of fire incidence; cooking and heating equipment are second place as sources, which align with @fig-area-origin-distribution result, where Ketchen is the place most fire incidence starts off.
-
+    This variable provides information about the cause of the fire. Categories of ignition sources, such as "Incandescent Lamp" or "Vehicle - Mechanical," were listed. The distribution of ignition sources was visualized with a bar plot (see @fig-grouped-ignition-source-distribution). We can tell that fire-related and open flame is one of the biggest sources of fire incidence; cooking and heating equipment are second place as sources, which aligns with @fig-area-origin-distribution result, where Ketchen is the place most fire incidence starts off.
+    
 ```{r}
 #| label: fig-grouped-ignition-source-distribution
 #| fig-cap: Bar plot illustrating the distribution of grouped ignition sources for fire incidents. The plot categorizes ignition sources into meaningful groups such as Lighting and Electrical Equipment, Cooking and Heating Equipment, and Mechanical Equipment, among others. The frequency of each group is displayed. Fire-related and Open Flame is the bigget ingnition source.
@@ -514,7 +517,7 @@ ggplot(fire_data, aes(x = ignition_source_grouped)) +
 ```
 
 **Understanding Potential Indicators of Severity and Their Replashioships**:\
-To explore the relationship between financial losses and casualties, incidents were grouped into financial loss and casualty categories. A heatmap below (@fig-financial-loss-vs-casualties-heatmap) illustrates the interaction between these two indicators.
+    To explore the relationship between financial losses and casualties, incidents were grouped into financial loss and casualty categories. A heatmap below (@fig-financial-loss-vs-casualties-heatmap) illustrates the interaction between these two indicators.
 
 ```{r}
 #| label: fig-financial-loss-vs-casualties-heatmap
@@ -591,9 +594,9 @@ ggplot(fire_data, aes(y = number_of_responding_apparatus, x = Log_Dollar_Loss)) 
 
 ## Define Severity
 
-The severity of fire incidents was categorized based on three key factors: the number of responding fire apparatus, the estimated dollar loss, and the total number of casualties. First, the total number of responding apparatus from TFS was calculated and divided into bins after plotting and observing its distribution. Each incident was assigned to a bin based on how many apparatus responded, helping categorize incidents in terms of the scale of response.
+The severity of fire incidents was categorized based on three key factors: the number of responding fire apparatus, the estimated dollar loss, and the total number of casualties. First, the total number of responding apparatus from TFS was calculated and divided into bins after plotting and observing its distribution. Each incident was assigned to a bin based on how many apparatuses responded, helping categorize incidents in terms of the scale of response.
 
-Next, the estimated dollar loss for each fire incident was log-transformed. This was necessary because the data was extremely right-skewed, with highly influential outliers. The transformation compressed the scale of the data and managed extreme values better. The transformed data was stored in a new variable called `log_estimated_dollar_loss`. Quantiles (25th, 50th, 75th percentiles) were used to divide the dollar loss into categories to make severity thresholds more meaningful.
+Next, the estimated dollar loss for each fire incident was log-transformed. This was necessary because the data was extremely right-skewed, with highly influential outliers. The transformation compressed the scale of the data and managed extreme values better. The transformed data was stored in a new variable called `log_estimated_dollar_loss`. Quantiles (25th, 50th, and 75th percentiles) were used to divide the dollar loss into categories to make severity thresholds more meaningful.
 
 ```{r}
 #| echo: false
@@ -714,7 +717,7 @@ To evaluate model performance, the dataset was split into a training set (80%) a
 
 ## Model Explanation
 
-A logistic regression model was chosen because the outcome variable, Severity_high, is binary (0/1), and logistic regression is well-suited for binary classification tasks, especially when working with categorical predictor variables. The logistic regression model used the following predictors. The logistic regression model was initially fitted to the training dataset using the formula: ***Severity_high \~ area_of_origin_grouped + ignition_source_grouped.*** This initial model can be expressed as:
+A logistic regression model was chosen because the outcome variable, Severity_high, is binary (0/1), and logistic regression is appropriate for binary classification tasks. Especially here, we are working with categorical predictor variables. The logistic regression model used the following predictors. The logistic regression model was initially fitted to the training dataset using the formula: ***Severity_high \~ area_of_origin_grouped + ignition_source_grouped.*** This initial model can be expressed as:
 
 $$
 \text{logit}(P) = \ln\left(\frac{P}{1-P}\right) = \beta_0 + \sum_{j=1}^{n_{\text{area}}} \beta_{j,\text{area}} \cdot X_{j,\text{area}} + \sum_{k=1}^{n_{\text{ignition}}} \beta_{k,\text{ignition}} \cdot X_{k,\text{ignition}}
@@ -729,13 +732,13 @@ $\beta_1, \beta_2, \dots, \beta_k$ are the coefficients of the predictor variabl
 
 The logistic regression model has several limitations. First, it only considers predictors such as area of origin and ignition source, excluding potentially significant factors like weather conditions and building materials, which could affect fire severity. Additionally, the model assumes that the relationships between predictors and severity are linear, which may not fully capture the complexity of fire incidents. Most importantly, the categorization of severity is based on predetermined thresholds, which may not be universally applicable, as different contexts may require different severity definitions. Lastly, the model's predictive accuracy is influenced by the quality of the data.
 
-Notably, there is a slight class imbalance in the dataset, high-severity incidents are underrepresented. In the training dataset, only 74 out of 10,237 records are classified as high severity. This imbalance can affect the model’s accuracy and its ability to predict high-severity incidents effectively.
+Notably, there is a slight class imbalance in the dataset, and high-severity incidents are underrepresented. In the training dataset, only 74 out of 10,237 records are classified as high severity. This imbalance can affect the model’s accuracy and its ability to predict high-severity incidents effectively.
 
 ## Model Justification
 
-The initial logistic regression model was evaluated for the significance of the predictors using the p-values from the model summary. Since a high p-value suggests that the variable does not significantly contribute to the model in prediction, it was removed to simplify the model and improve interpretability. This decision follows the principle outlined by Occam's Razor [@blumer1987occam], which proposes that people prefer simplicity.
+The initial logistic regression model was tested for the significance of the predictors using the p-values from the model summary. Since a high p-value suggests that the variable does not significantly contribute to the model in prediction, it was removed to simplify the model and improve interpretability. This decision also follows the principle outlined in Occam's Razor [@blumer1987occam], which proposes that simplicity is preferred. 
 
-To check for multicollinearity among the predictors, the Variance Inflation Factor (VIF) was calculated. According to standard practice, if any predictors had a high VIF (greater than 5), they were considered for removal to avoid multicollinearity, which could distort the model's estimates [@alin2010multicollinearity].Based on the results, the variable `ignition_source_grouped` was removed from the model due to its non-significance (high p-value). The updated model retained only `area_of_origin_grouped`, which showed a significant relationship with the likelihood of high-severity fires. Model is:
+To check for multicollinearity among the predictors, the Variance Inflation Factor (VIF) was calculated. According to standard practice, if any predictors had a high VIF (greater than 5), they were considered for removal to avoid multicollinearity, which could distort the model's estimates [@alin2010multicollinearity]. Based on the results, the variable `ignition_source_grouped` was removed from the model due to its non-significance (high p-value). The updated model retained only `area_of_origin_grouped`, which showed a significant relationship with the likelihood of high-severity fires. Model is:
 
 $$
 \text{logit}(P) = \ln\left(\frac{P}{1-P}\right) = \beta_0 + \sum_{j=1}^{n_{\text{area}}} \beta_{j,\text{area}} \cdot X_{j,\text{area}}
@@ -751,7 +754,7 @@ The updated logistic regression model was evaluated using the receiver operating
 
 ## Logistic Regression Model Results
 
-The logistic regression model was fitted to predict the probability of high severity fire incidents based on the categorical variables **area of origin**. The final model keep only significant predictors based on p-values and col-linearity diagnostics. below is a summary ( see @fig-logisticresults-summary) of the model's estimates. The coefficients of each predictor. And Also included other information about model evaluation. It's noticeable that RMSE is not ideal, but this is already an improvement from the initial model.
+The logistic regression model was fitted to predict the probability of high-severity fire incidents based on the categorical variables `Area of Origin`. The final model keeps only significant predictors based on p-values and colinearity diagnostics. Below is a summary @fig-logisticresults-summary of the model's estimates. The coefficients of each predictor. It also included other information about model evaluation. It's noticeable that RMSE is not ideal, but this is already an improvement from the initial model.
 
 ```{r}
 #| echo: false
@@ -761,8 +764,7 @@ The logistic regression model was fitted to predict the probability of high seve
 #| label: fig-logisticresults-summary
 #| fig-cap: "Table showing the summary of logistic regression model estimates for predicting fire severity. The table includes coefficients for each significant predictor, their standard errors, z-values, and associated p-values. Significant predictors are highlighted, with p-values less than 0.05 indicating statistical significance. The results provide insights into the relationship between 'Area of Origin' and the likelihood of high-severity fire incidents."
 #| fig.align: left
-#| fig.width: 6
-#| fig.height: 4
+
 library(rstanarm)
 library(modelsummary)
 library(tidyverse)
@@ -820,7 +822,7 @@ kable(coefficients_table, digits = 2)
 
 ```
 
-The estimated coefficients for the significant predictor (`area_of_origin`) are visualized to interpret the relative influence of different categories below (@fig-logesiticresults). We can tell most categories are relative to the severity of fire incidence. For example, Fire from mechanical, HVAC, and electrical Areas are highly contributing to the occurrence of ore sever fire incidence.
+The estimated coefficients for the significant predictor (`area_of_origin`) are visualized to interpret the relative influence of different categories below (@fig-logesiticresults). We can tell most categories are relative to the severity of fire incidence. For example, Fire from mechanical, HVAC, and electrical Areas are highly contributing to the occurrence of more severe fire incidents.
 
 ```{r}
 #| echo: false
